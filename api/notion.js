@@ -39,6 +39,14 @@ export default async function handler(req, res) {
     ARTWORK: process.env.NOTION_DB_ARTWORK
   };
 
+  // 디버깅: 환경 변수 확인
+  console.log('Environment variables:', {
+    hasApiKey: !!NOTION_API_KEY,
+    hasCV: !!DATABASES.CV,
+    hasWORK: !!DATABASES.WORK,
+    hasARTWORK: !!DATABASES.ARTWORK
+  });
+
   // API 키 확인
   if (!NOTION_API_KEY) {
     console.error('NOTION_API_KEY 환경 변수가 설정되지 않았습니다.');
@@ -52,11 +60,16 @@ export default async function handler(req, res) {
 
   const databaseId = DATABASES[database];
   
-  // 데이터베이스 ID에서 하이픈 제거
-  const formattedDatabaseId = databaseId.replace(/-/g, '');
+  // 데이터베이스 ID 정리 (공백 제거, 하이픈 제거)
+  const cleanedId = databaseId.trim().replace(/-/g, '');
+  
+  console.log(`Querying database: ${database}`);
+  console.log(`Original ID: ${databaseId}`);
+  console.log(`Cleaned ID: ${cleanedId}`);
+  console.log(`ID length: ${cleanedId.length} (should be 32)`);
 
   try {
-    const response = await fetch(`https://api.notion.com/v1/databases/${formattedDatabaseId}/query`, {
+    const response = await fetch(`https://api.notion.com/v1/databases/${cleanedId}/query`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${NOTION_API_KEY}`,

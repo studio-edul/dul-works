@@ -2,9 +2,7 @@
   "name": "portfolio-notion-api",
   "version": "1.0.0",
   "description": "Portfolio website with Notion API backend",
-  "scripts": {
-    "dev": "vercel dev"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC"

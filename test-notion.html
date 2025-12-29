@@ -70,45 +70,21 @@
     <script src="config.js"></script>
     <script src="notion-api.js"></script>
     <script>
-        // API 키 및 데이터베이스 ID 확인
+        // 백엔드 API 엔드포인트 확인
         function checkConfig() {
-            const apiKey = NOTION_CONFIG.API_KEY;
-            const databases = NOTION_CONFIG.DATABASES;
+            const apiEndpoint = NOTION_CONFIG.API_ENDPOINT;
             const apiKeyEl = document.getElementById('api-key-info');
             const databaseEl = document.getElementById('database-info');
             
-            // API 키 확인
-            if (apiKey === 'YOUR_NOTION_API_KEY_HERE' || !apiKey) {
-                apiKeyEl.innerHTML = '<span class="error">❌ API 키가 설정되지 않았습니다. config.js 파일에 API 키를 입력해주세요.</span>';
+            // API 엔드포인트 확인
+            if (!apiEndpoint || apiEndpoint === 'https://your-project.vercel.app/api/notion') {
+                apiKeyEl.innerHTML = '<span class="error">❌ API 엔드포인트가 설정되지 않았습니다. config.js 파일에 API_ENDPOINT를 설정해주세요.</span>';
+                databaseEl.innerHTML = '<span class="error">백엔드 방식에서는 API 키와 DB ID는 Vercel 환경 변수에 설정되어 있습니다.</span>';
                 return false;
             }
             
-            // Notion API 키 형식 확인 (secret_ 또는 ntn_로 시작)
-            if (apiKey.startsWith('secret_') || apiKey.startsWith('ntn_')) {
-                apiKeyEl.innerHTML = `<span class="success">✅ API 키 형식이 올바릅니다.</span><br>형식: ${apiKey.substring(0, 10)}...`;
-            } else {
-                apiKeyEl.innerHTML = `<span class="error">⚠️ API 키 형식이 예상과 다릅니다. (secret_ 또는 ntn_로 시작해야 함)</span><br>현재: ${apiKey.substring(0, 20)}...`;
-            }
-            
-            // 데이터베이스 ID 확인
-            const dbStatus = [];
-            if (databases.CV && databases.CV !== 'YOUR_CV_DATABASE_ID_HERE') {
-                dbStatus.push(`✅ CV: ${databases.CV.substring(0, 20)}...`);
-            } else {
-                dbStatus.push(`❌ CV: 설정되지 않음`);
-            }
-            if (databases.WORK && databases.WORK !== 'YOUR_WORK_DATABASE_ID_HERE') {
-                dbStatus.push(`✅ WORK: ${databases.WORK.substring(0, 20)}...`);
-            } else {
-                dbStatus.push(`❌ WORK: 설정되지 않음`);
-            }
-            if (databases.ARTWORK && databases.ARTWORK !== 'YOUR_ARTWORK_DATABASE_ID_HERE') {
-                dbStatus.push(`✅ ARTWORK: ${databases.ARTWORK.substring(0, 20)}...`);
-            } else {
-                dbStatus.push(`❌ ARTWORK: 설정되지 않음`);
-            }
-            
-            databaseEl.innerHTML = dbStatus.join('<br>');
+            apiKeyEl.innerHTML = `<span class="success">✅ API 엔드포인트가 설정되었습니다.</span><br>엔드포인트: ${apiEndpoint}`;
+            databaseEl.innerHTML = '<span class="success">✅ 백엔드 방식 사용 중<br>API 키와 DB ID는 Vercel 환경 변수에 설정되어 있습니다.<br>데이터베이스: CV, WORK, ARTWORK</span>';
             
             return true;
         }
@@ -131,7 +107,7 @@
                 showResult({ 
                     success: true,
                     database: 'CV',
-                    results: data.results?.length || 0,
+                    results: data.length || 0,
                     data: data 
                 });
             } catch (error) {
@@ -153,7 +129,7 @@
                 showResult({ 
                     success: true,
                     database: 'WORK',
-                    results: data.results?.length || 0,
+                    results: data.length || 0,
                     data: data 
                 });
             } catch (error) {
@@ -175,7 +151,7 @@
                 showResult({ 
                     success: true,
                     database: 'ARTWORK',
-                    results: data.results?.length || 0,
+                    results: data.length || 0,
                     data: data 
                 });
             } catch (error) {
@@ -196,9 +172,9 @@
                 const data = await getAllNotionData();
                 showResult({ 
                     success: true,
-                    CV: { results: data.CV.results?.length || 0 },
-                    WORK: { results: data.WORK.results?.length || 0 },
-                    ARTWORK: { results: data.ARTWORK.results?.length || 0 },
+                    CV: { results: data.CV?.length || 0 },
+                    WORK: { results: data.WORK?.length || 0 },
+                    ARTWORK: { results: data.ARTWORK?.length || 0 },
                     data: data 
                 });
             } catch (error) {
