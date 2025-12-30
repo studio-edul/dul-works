@@ -1,6 +1,6 @@
 import ImageWithOverlay from './ImageWithOverlay';
 import Link from 'next/link';
-import { createSlug } from '../lib/slug-utils';
+import { createSlug } from '@/lib/slug-utils';
 
 export default function ProjectItem({ project, artworkImages }) {
   const { name, period, description, index } = project;
@@ -90,7 +90,7 @@ export default function ProjectItem({ project, artworkImages }) {
           // Index "1,1"은 텍스트 위치이므로, 실제로는 텍스트 다음 위치(2)에 배치
           // Index "1,2"는 텍스트 다음 다음 위치(3)에 배치
           const actualRow = column === 1 ? row + 1 : row; // 1열은 텍스트가 있으므로 +1
-          
+
           while (columnArrays[column].length < actualRow) {
             columnArrays[column].push(null);
           }

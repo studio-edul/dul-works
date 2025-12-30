@@ -1,41 +1,27 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { createSlug } from '../lib/slug-utils';
+import { createSlug } from '@/lib/slug-utils';
 
-export default function ImageWithOverlay({ 
-  imageUrl, 
-  name, 
-  timeline, 
-  description, 
-  isFullWidth = false 
+export default function ImageWithOverlay({
+  imageUrl,
+  name,
+  timeline,
+  description,
+  isFullWidth = false
 }) {
-  const [dimensions, setDimensions] = useState({ width: 595, height: 400, fullWidth: 1200 });
-
-  useEffect(() => {
-    // CSS 변수에서 값을 읽어오기
-    const root = document.documentElement;
-    const columnWidth = parseInt(getComputedStyle(root).getPropertyValue('--column-width')) || 595;
-    const columnGap = parseInt(getComputedStyle(root).getPropertyValue('--column-gap')) || 10;
-    const fullWidth = columnWidth * 2 + columnGap;
-    
-    setDimensions({
-      width: columnWidth,
-      height: isFullWidth ? 600 : 400,
-      fullWidth: fullWidth
-    });
-  }, [isFullWidth]);
+  const WIDTH_COLUMN = 595;
+  const WIDTH_FULL = 1200;
 
   if (!imageUrl) return null;
 
   const containerClass = isFullWidth ? 'image-container-full' : 'image-container';
-  const imageWidth = isFullWidth ? dimensions.fullWidth : dimensions.width;
-  const imageHeight = dimensions.height;
-  
+  const imageWidth = isFullWidth ? WIDTH_FULL : WIDTH_COLUMN;
+  const imageHeight = isFullWidth ? 600 : 400; // Aspect ratio placeholder
+
   // sizes 속성으로 반응형 이미지 최적화
-  const sizes = isFullWidth 
-    ? `${dimensions.fullWidth}px`
-    : `${dimensions.width}px`;
+  const sizes = isFullWidth
+    ? `${WIDTH_FULL}px`
+    : `${WIDTH_COLUMN}px`;
 
   const slug = name ? createSlug(name) : null;
   const href = slug ? `/work/${slug}` : '#';
@@ -52,6 +38,10 @@ export default function ImageWithOverlay({
           loading="lazy"
           quality={90}
           sizes={sizes}
+          style={{
+            width: '100%',
+            height: 'auto',
+          }}
         />
         <div className="overlay-text">
           <div className="overlay-text-title">{name || 'none'}</div>

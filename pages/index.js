@@ -1,5 +1,5 @@
-import Layout from '../components/Layout';
-import { getAllNotionDataServer } from '../lib/notion-api-server';
+import Layout from '@/components/Layout';
+import { getAllNotionDataServer } from '@/lib/notion-api-server';
 
 export default function Home() {
   return (
@@ -13,7 +13,7 @@ export async function getStaticProps() {
   try {
     // 데이터 미리 로드 (캐싱용)
     await getAllNotionDataServer();
-    
+
     return {
       props: {},
       revalidate: 60 // ISR: 60초마다 재생성

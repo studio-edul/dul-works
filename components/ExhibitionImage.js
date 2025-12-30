@@ -1,25 +1,11 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { createSlug } from '../lib/slug-utils';
+import { createSlug } from '@/lib/slug-utils';
 
 export default function ExhibitionImage({ exhibition }) {
   const { name, imageUrl } = exhibition;
   const slug = name ? createSlug(name) : null;
-  
-  const [columnWidth, setColumnWidth] = useState(495);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const root = document.documentElement;
-      const computedColumnWidth = getComputedStyle(root).getPropertyValue('--column-width');
-      
-      if (computedColumnWidth) {
-        const width = parseInt(computedColumnWidth.replace('px', ''), 10);
-        if (!isNaN(width)) setColumnWidth(width);
-      }
-    }
-  }, []);
 
   if (!imageUrl) return null;
 
@@ -29,14 +15,14 @@ export default function ExhibitionImage({ exhibition }) {
         <Image
           src={imageUrl}
           alt={name || ''}
-          width={columnWidth}
+          width={595}
           height={400}
           className="project-image"
           loading="lazy"
           quality={90}
-          sizes={`${columnWidth}px`}
+          sizes="595px"
           style={{
-            width: `${columnWidth}px`,
+            width: '100%',
             height: 'auto',
             maxWidth: 'none',
           }}

@@ -13,11 +13,11 @@ module.exports = {
       },
       maxWidth: {
         'container': '1440px',
-        'column': '495px',
+        'column': '595px',
       },
       spacing: {
         'column-gap': '10px',
-        'full-image': 'calc(495px * 2 + 10px)',
+        'full-image': 'calc(595px * 2 + 10px)',
       },
     },
   },

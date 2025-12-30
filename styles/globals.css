@@ -166,14 +166,15 @@
   }
 
   .image-container {
-    @apply relative inline-block overflow-hidden;
+    @apply relative block overflow-hidden;
+    width: 100%;
     line-height: 0;
-    vertical-align: bottom;
   }
 
   .image-container-full {
     @apply relative block overflow-hidden;
-    width: var(--full-width-image);
+    width: 100%;
+    max-width: var(--full-width-image);
     line-height: 0;
   }
 
@@ -203,7 +204,7 @@
     @apply absolute bottom-[30px] left-5 flex flex-col items-start gap-[5px] z-10;
   }
 
-  .overlay-text > div {
+  .overlay-text>div {
     @apply bg-white text-black px-2 py-1 font-sans m-0 leading-tight shadow-sm;
   }
 
@@ -225,6 +226,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .full-width-images-wrapper .image-link {
+    width: 100%;
+    /* max-width는 내부 .image-container-full에서 처리함 */
   }
 
   .cv-class-item {
@@ -402,12 +408,14 @@
 
   /* SVG 선 두께 조절 (stroke 기반 SVG인 경우) */
   .contact-icon-svg svg {
-    stroke-width: 1.5px; /* 선 두께 설정 - 원하는 값으로 변경 가능 */
+    stroke-width: 1.5px;
+    /* 선 두께 설정 - 원하는 값으로 변경 가능 */
   }
 
   /* SVG 채우기 색상 조절 (fill 기반 SVG인 경우) */
   .contact-icon-svg svg path {
-    fill: currentColor; /* 현재 텍스트 색상 사용 */
+    fill: currentColor;
+    /* 현재 텍스트 색상 사용 */
   }
 
   /* stroke 기반 SVG인 경우 */
@@ -424,4 +432,3 @@
     background-color: #f0f0f0;
   }
 }
-
