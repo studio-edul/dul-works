@@ -29,6 +29,7 @@ export default function TimelineItem({ timeline, artworkImages }) {
             key={`${imageData.url}-${imageData.timelineIndex || 'default'}`}
             imageUrl={imageData.url}
             name={imageData.name}
+            timeline={name}
           />
         );
         return;
@@ -41,6 +42,7 @@ export default function TimelineItem({ timeline, artworkImages }) {
             key={`${imageData.url}-full`}
             imageUrl={imageData.url}
             name={imageData.name}
+            timeline={name}
             isFullWidth={true}
           />
         );
@@ -59,13 +61,14 @@ export default function TimelineItem({ timeline, artworkImages }) {
               key={`${imageData.url}-${column}-${row}`}
               imageUrl={imageData.url}
               name={imageData.name}
+              timeline={name}
             />
           );
 
           // 텍스트가 이미 1열 1번 위치에 있으므로, 이미지 Index는 텍스트를 제외한 위치
           // Index "1,1"은 텍스트 위치이므로, 실제로는 텍스트 다음 위치(2)에 배치
           const actualRow = column === 1 ? row + 1 : row; // 1열은 텍스트가 있으므로 +1
-          
+
           while (columnArrays[column].length < actualRow) {
             columnArrays[column].push(null);
           }

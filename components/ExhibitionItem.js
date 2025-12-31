@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { createSlug } from '@/lib/slug-utils';
 
-export default function ExhibitionItem({ exhibition }) {
+export default function ExhibitionItem({ exhibition, isFull }) {
   const { name, period, description, imageUrl, index } = exhibition;
   const slug = name ? createSlug(name) : null;
 
@@ -20,7 +20,7 @@ export default function ExhibitionItem({ exhibition }) {
   ) : null;
 
   return (
-    <div className="exhibition-item">
+    <div className={`exhibition-item ${isFull ? 'is-full-width-item' : ''}`}>
       <Link href={slug ? `/work/${slug}` : '#'} className="exhibition-item-link">
         <div className="exhibition-name">{name}</div>
         {descriptionHtml}

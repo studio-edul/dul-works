@@ -42,8 +42,28 @@ export default function WorkContent({ view, projects, artworkMap, exhibitions, t
     const soloExhibitions = exhibitions.filter(item => item.classType === 'SOLO EXHIBITION');
     const groupExhibitions = exhibitions.filter(item => item.classType === 'GROUP EXHIBITION');
 
-    // Index에 따라 좌우 번갈아가면서 배치
-    // Index 1 = 왼쪽, 2 = 오른쪽, 3 = 왼쪽, 4 = 오른쪽...
+    // Sort by index for mobile view (and consistency)
+    const sortByIndex = (a, b) => {
+      const getOrder = (item) => {
+        if (item.index === null || item.index === undefined) return Infinity;
+        const s = String(item.index).trim();
+        // Handle "1,2" format -> treat as 1000*col + row
+        if (s.includes(',')) {
+          const parts = s.split(',');
+          const col = parseFloat(parts[0]);
+          const row = parseFloat(parts[1]);
+          return col * 1000 + row;
+        }
+        return isNaN(s) ? Infinity : Number(s);
+      };
+
+      return getOrder(a) - getOrder(b);
+    };
+
+    soloExhibitions.sort(sortByIndex);
+    groupExhibitions.sort(sortByIndex);
+
+    // Index에 따라 좌우 번갈아가면서 배치 (Desktop Logic)
     const soloColumnArrays = {
       1: [],
       2: []
@@ -53,49 +73,54 @@ export default function WorkContent({ view, projects, artworkMap, exhibitions, t
       2: []
     };
 
-    // SOLO EXHIBITION 배치
-    soloExhibitions.forEach((exhibition, idx) => {
-      const exhibitionItem = (
-        <ExhibitionItem
-          key={`solo-${exhibition.name || idx}`}
-          exhibition={exhibition}
-        />
-      );
+    // Helper to determine column
+    const addToColumnArrays = (collection, arrays) => {
+      collection.forEach((exhibition, idx) => {
+        const indexStr = String(exhibition.index).trim();
+        const isFull = indexStr.toLowerCase() === 'full';
 
-      if (exhibition.index !== null && !isNaN(exhibition.index)) {
-        // Index가 홀수면 왼쪽(1열), 짝수면 오른쪽(2열)
-        const column = exhibition.index % 2 === 1 ? 1 : 2;
-        soloColumnArrays[column].push(exhibitionItem);
-      } else {
-        // Index가 없으면 왼쪽에 순서대로 추가
-        soloColumnArrays[1].push(exhibitionItem);
-      }
-    });
+        const exhibitionItem = (
+          <ExhibitionItem
+            key={`${exhibition.name || idx}`}
+            exhibition={exhibition}
+            isFull={isFull}
+          />
+        );
 
-    // GROUP EXHIBITION 배치
-    groupExhibitions.forEach((exhibition, idx) => {
-      const exhibitionItem = (
-        <ExhibitionItem
-          key={`group-${exhibition.name || idx}`}
-          exhibition={exhibition}
-        />
-      );
+        let targetCol = 1;
 
-      if (exhibition.index !== null && !isNaN(exhibition.index)) {
-        // Index가 홀수면 왼쪽(1열), 짝수면 오른쪽(2열)
-        const column = exhibition.index % 2 === 1 ? 1 : 2;
-        groupColumnArrays[column].push(exhibitionItem);
-      } else {
-        // Index가 없으면 왼쪽에 순서대로 추가
-        groupColumnArrays[1].push(exhibitionItem);
-      }
-    });
+        if (indexStr.includes(',')) {
+          // "2,1" style
+          const parts = indexStr.split(',');
+          const col = parseInt(parts[0], 10);
+          if (col === 1 || col === 2) {
+            targetCol = col;
+          }
+        } else if (!isNaN(indexStr) && indexStr !== '' && !isFull) {
+          // "1", "2", "3" style -> Odd=1, Even=2
+          const val = parseInt(indexStr, 10);
+          targetCol = val % 2 === 1 ? 1 : 2;
+        }
+
+        // If 'full', it defaults to column 1 in desktop view (as strictly requested for desktop logic not specified for full)
+        // But user said "1024 미만일 때 index를 full로..." implying full only special on mobile?
+        // If full on desktop should be full width, we need separate logic, but assuming col 1 for now or 
+        // if user wants it spanning 2 cols, that's a bigger change. 
+        // Given current constraints, placing in col 1 is safe.
+
+        arrays[targetCol].push(exhibitionItem);
+      });
+    };
+
+    addToColumnArrays(soloExhibitions, soloColumnArrays);
+    addToColumnArrays(groupExhibitions, groupColumnArrays);
 
     return (
       <div id="content-area">
         {/* SOLO EXHIBITION 그룹 */}
         <div className="exhibition-solo-group">
-          <div className="columns-container">
+          {/* Desktop View (2 Columns) */}
+          <div className="desktop-view columns-container">
             <div className="column">
               {soloColumnArrays[1]}
             </div>
@@ -103,16 +128,38 @@ export default function WorkContent({ view, projects, artworkMap, exhibitions, t
               {soloColumnArrays[2]}
             </div>
           </div>
+          {/* Mobile View (1 Column Sorted) */}
+          <div className="mobile-view project-list-single">
+            {soloExhibitions.map((exhibition, idx) => (
+              <ExhibitionItem
+                key={`solo-mobile-${exhibition.name || idx}`}
+                exhibition={exhibition}
+                isFull={String(exhibition.index || '').trim().toLowerCase() === 'full'}
+              />
+            ))}
+          </div>
         </div>
+
         {/* GROUP EXHIBITION 그룹 */}
         <div className="exhibition-group-group">
-          <div className="columns-container">
+          {/* Desktop View (2 Columns) */}
+          <div className="desktop-view columns-container">
             <div className="column">
               {groupColumnArrays[1]}
             </div>
             <div className="column">
               {groupColumnArrays[2]}
             </div>
+          </div>
+          {/* Mobile View (1 Column Sorted) */}
+          <div className="mobile-view project-list-single">
+            {groupExhibitions.map((exhibition, idx) => (
+              <ExhibitionItem
+                key={`group-mobile-${exhibition.name || idx}`}
+                exhibition={exhibition}
+                isFull={String(exhibition.index || '').trim().toLowerCase() === 'full'}
+              />
+            ))}
           </div>
         </div>
       </div>

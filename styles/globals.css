@@ -38,11 +38,15 @@
   }
 
   .side-menu {
-    @apply fixed right-[120px] top-1/2 -translate-y-1/2 flex flex-col gap-5 z-[1000] text-right;
+    @apply absolute flex flex-col gap-5 z-[1000] text-left;
+    top: 0;
+    left: calc(50% + min(600px, 50vw - 120px) + 30px);
+    right: auto;
+    /* transform handled by JS */
   }
 
   .side-menu-item {
-    @apply font-sans text-base font-normal bg-transparent border-0 text-inherit cursor-pointer p-0 text-right transition-opacity duration-200 opacity-30;
+    @apply font-sans text-base font-normal bg-transparent border-0 text-inherit cursor-pointer p-0 text-left transition-opacity duration-200 opacity-30;
   }
 
   .side-menu-item:hover {
@@ -56,12 +60,79 @@
   .columns-container {
     @apply flex justify-center;
     gap: var(--column-gap);
+    width: 100%;
   }
 
   .column {
     width: var(--column-width);
     max-width: var(--column-width);
   }
+
+  /* Default (Desktop) state */
+  .mobile-view {
+    display: none;
+  }
+
+  .desktop-view {
+    /* display: block; removed to allow flex container to work */
+  }
+
+  @media (max-width: 1024px) {
+
+    /*
+       Previous generic 1-column logic kept for Project/Timeline views
+       if they reuse .columns-container directly without .desktop-view wrapper.
+       But for Exhibition which uses wrapper, we toggle views.
+    */
+    .columns-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .column {
+      width: 100%;
+      max-width: 595px;
+    }
+
+    /* Toggle views for Exhibition */
+    .mobile-view {
+      display: block;
+    }
+
+    .desktop-view {
+      display: none;
+    }
+
+    .project-list-single {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Ensure mobile items have max-width constraint */
+    .project-list-single>div {
+      width: 100%;
+      max-width: 595px;
+    }
+
+    /* Allow full-width items to expand */
+    .project-list-single>.is-full-width-item {
+      max-width: none;
+    }
+
+    /* Constrain full-width images to content width on mobile */
+    .image-container-full {
+      max-width: 100%;
+    }
+
+    .project-image-full {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+
 
   .project-link {
     @apply no-underline text-inherit block;
@@ -121,7 +192,7 @@
   }
 
   .description-box {
-    width: var(--column-width);
+    width: 100%;
     @apply font-sans text-sm font-normal border-l border-black pl-[10px] mb-[15px] box-border whitespace-pre-wrap;
     line-height: 19px;
   }
@@ -141,7 +212,7 @@
   }
 
   .exhibition-solo-group {
-    margin-bottom: 50px;
+    margin-bottom: 100px;
   }
 
   .timeline-name {
@@ -150,7 +221,7 @@
   }
 
   .timeline-group {
-    margin-bottom: 50px;
+    margin-bottom: 100px;
   }
 
   .exhibition-item {
@@ -201,7 +272,6 @@
   .project-image[loading="lazy"],
   .project-image-full[loading="lazy"] {
     @apply bg-gray-100;
-    min-height: 200px;
   }
 
   .overlay-text {
@@ -222,7 +292,7 @@
   }
 
   .name-container {
-    @apply mb-[50px] flex flex-col items-center;
+    @apply mb-[100px] flex flex-col items-center;
   }
 
   .full-width-images-wrapper {
@@ -278,9 +348,27 @@
   }
 
   .exhibition-name {
-    @apply font-sans font-bold mb-[15px] relative inline-block;
+    @apply font-sans font-bold relative;
+    display: inline;
     font-size: 20px;
-    padding-right: 15px;
+    margin-right: 15px;
+    padding-right: 0;
+
+    background-image: linear-gradient(to right, black, black);
+    background-position: bottom left;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size 0.3s ease-out;
+  }
+
+  /* Add margin to the element following the inline title to maintain vertical spacing */
+  .exhibition-name-link>.exhibition-name+* {
+    margin-top: 15px;
+  }
+
+  /* Fallback if description/image are direct children of Link */
+  .exhibition-name+div {
+    margin-top: 15px;
   }
 
   .exhibition-name-link {
@@ -293,9 +381,8 @@
 
   .exhibition-name::after {
     content: '→';
-    position: absolute;
-    right: -15px;
-    top: 0;
+    display: inline-block;
+    margin-left: 10px;
     opacity: 0;
     transform: translateX(-10px);
     transition: opacity 0.3s ease-out, transform 0.3s ease-out;
@@ -306,33 +393,13 @@
     transform: translateX(0);
   }
 
+  /* Remove old underline pseudo-element */
   .exhibition-name::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: calc(100% + 15px);
-    height: 1px;
-    background-color: black;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease-out;
+    content: none;
   }
 
-  .exhibition-item-link:hover .exhibition-name::before {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-
-  .exhibition-item-link:not(:hover) .exhibition-name::before {
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-
-  .exhibition-item-link:not(:hover) .exhibition-name::after {
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  .exhibition-item-link:hover .exhibition-name {
+    background-size: 100% 1px;
   }
 
   .exhibition-period {
@@ -442,5 +509,44 @@
     width: 1px;
     height: 20px;
     background-color: #f0f0f0;
+  }
+
+  @media (max-width: 640px) {
+
+    /* Typography Scaling: 16px -> 14px */
+    .nav-item,
+    .side-menu-item,
+    .overlay-text-title,
+    .cv-class-item {
+      font-size: 14px;
+    }
+
+    /* Typography Scaling: 14px -> 12px */
+    .project-period,
+    .description-box,
+    .overlay-text-year,
+    .overlay-text-caption,
+    .cv-data-period,
+    .cv-data-name-client,
+    .cv-data-place,
+    .exhibition-period,
+    .exhibition-description,
+    .contact-link {
+      font-size: 12px;
+    }
+
+    /* Typography Scaling: 20px -> 18px */
+    .project-item,
+    .exhibition-name,
+    .timeline-name,
+    .artwork-detail-name {
+      font-size: 18px;
+    }
+
+    /* Overlay Spacing: 20px -> 10px */
+    .overlay-text {
+      bottom: 10px !important;
+      left: 10px !important;
+    }
   }
 }
