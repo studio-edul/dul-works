@@ -40,7 +40,7 @@
   .side-menu {
     @apply absolute flex flex-col gap-5 z-[1000] text-left;
     top: 0;
-    left: calc(50% + min(600px, 50vw - 120px) + 30px);
+    left: calc(50% + min(600px, 50vw - 120px) + 15px);
     right: auto;
     /* transform handled by JS */
   }
@@ -275,11 +275,13 @@
   }
 
   .overlay-text {
-    @apply absolute bottom-[30px] left-5 flex flex-col items-start gap-[5px] z-10;
+    @apply absolute bottom-[20px] left-5 flex flex-col items-start gap-[5px] z-10;
   }
 
   .overlay-text>div {
     @apply bg-white text-black px-2 py-1 font-sans m-0 leading-tight shadow-sm;
+    display: inline-block;
+    width: fit-content;
   }
 
   .overlay-text-title {
@@ -423,9 +425,237 @@
     @apply mb-0;
   }
 
+  /* 상세 페이지에서 body 패딩 오버라이드 */
+  body:has(.artwork-detail-container) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .artwork-detail-container {
+    max-width: 1420px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    position: relative;
+  }
+
+  .artwork-detail-column-placeholder {
+    /* 그리드 레이아웃 유지를 위한 placeholder */
+  }
+
+  .artwork-detail-text-column {
+    @apply absolute flex flex-col z-[1000] text-left;
+    top: 0;
+    /* 첫 번째 열 위치: 컨테이너 내부 기준으로 계산 */
+    /* 컨테이너 padding 15px + 첫 번째 열 시작 위치 */
+    left: 15px;
+    right: auto;
+    /* 너비는 JavaScript로 동적으로 계산됨 */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    /* transform handled by JS */
+  }
+
+  /* 반응형: 2열 레이아웃용 이미지 컬럼 (1024px 미만) - 기본적으로 숨김 */
+  .artwork-detail-column-responsive {
+    display: none;
+  }
+
+  /* 1024px 미만: 2열 레이아웃 */
+  @media (max-width: 1023px) {
+    .artwork-detail-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .artwork-detail-text-column {
+      position: relative;
+      left: 0;
+      transform: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .artwork-detail-column-placeholder {
+      display: none !important;
+    }
+
+    /* 기존 이미지 컬럼들을 완전히 숨김 */
+    .artwork-detail-container > .artwork-detail-column-1,
+    .artwork-detail-container > .artwork-detail-column-2 {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+
+    /* 반응형 이미지 컬럼만 표시 */
+    .artwork-detail-container > .artwork-detail-column-responsive {
+      display: flex !important;
+      flex-direction: column;
+      gap: 10px;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* 1024px 이상: 3열 레이아웃 - 반응형 이미지 컬럼 숨김 */
+  @media (min-width: 1024px) {
+    .artwork-detail-container > .artwork-detail-column-responsive {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .artwork-detail-container > .artwork-detail-column-1,
+    .artwork-detail-container > .artwork-detail-column-2 {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* 640px 미만: 1열 레이아웃 */
+  @media (max-width: 639px) {
+    .artwork-detail-container {
+      grid-template-columns: 1fr;
+    }
+
+    /* placeholder를 그리드에서 완전히 제거 */
+    .artwork-detail-column-placeholder {
+      display: none !important;
+    }
+
+    /* 기존 이미지 컬럼들을 완전히 숨김 (그리드에서도 제외) */
+    .artwork-detail-container > .artwork-detail-column-1,
+    .artwork-detail-container > .artwork-detail-column-2 {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+
+    /* 반응형 이미지 컬럼만 표시 */
+    .artwork-detail-container > .artwork-detail-column-responsive {
+      display: flex !important;
+      flex-direction: column;
+      gap: 10px;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  }
+
   .artwork-detail-name {
-    @apply font-sans font-bold mb-[15px] relative inline-block;
+    @apply font-sans font-bold relative inline-block;
     font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .artwork-detail-metadata {
+    border-left: 1px solid black;
+    padding-left: 10px;
+    margin-bottom: 10px;
+  }
+
+  .artwork-detail-artist,
+  .artwork-detail-timeline {
+    @apply font-sans;
+    font-size: 14px;
+    opacity: 0.3;
+    margin-bottom: 5px;
+  }
+
+  .artwork-detail-caption {
+    @apply font-sans;
+    font-size: 14px;
+    opacity: 0.3;
+  }
+
+  .artwork-detail-page-text {
+    @apply font-sans;
+    font-size: 14px;
+    opacity: 1;
+    /* margin-top: 10px; */
+  }
+
+  .artwork-detail-paragraph {
+    @apply font-sans;
+    font-size: 14px;
+    opacity: 1;
+    line-height: 1.4;
+    margin: 0;
+    white-space: pre-wrap; /* 연속된 공백 유지 */
+  }
+
+  /* 반응형 텍스트 크기 */
+  @media (max-width: 1023px) {
+    .artwork-detail-name {
+      font-size: 18px;
+    }
+
+    .artwork-detail-artist,
+    .artwork-detail-timeline,
+    .artwork-detail-caption,
+    .artwork-detail-page-text,
+    .artwork-detail-paragraph {
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .artwork-detail-name {
+      font-size: 16px;
+    }
+
+    .artwork-detail-artist,
+    .artwork-detail-timeline,
+    .artwork-detail-caption,
+    .artwork-detail-page-text,
+    .artwork-detail-paragraph {
+      font-size: 12px;
+    }
+  }
+
+  .artwork-detail-paragraph:last-child {
+    margin-bottom: 0;
+  }
+
+  /* 문단 구분(null) 다음 문단은 margin-top 추가하지 않음 (break가 간격 처리) */
+  .artwork-detail-paragraph-break + .artwork-detail-paragraph {
+    margin-top: 0;
+  }
+
+  .artwork-detail-paragraph-break {
+    height: 0.7em; /* 문단 구분 간격 (두 번 줄바꿈) */
+    margin: 0;
+  }
+
+  .artwork-detail-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .artwork-detail-image-wrapper {
+    width: 100%;
+    line-height: 0;
+  }
+
+  .artwork-detail-image {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 
   .contact-container {
