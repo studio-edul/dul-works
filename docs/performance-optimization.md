@@ -176,3 +176,5 @@ export async function getStaticPaths() {
 
 Next.js는 이미 잘 최적화된 프레임워크이며, 설정만 조정하면 충분히 빠른 성능을 얻을 수 있습니다.
 
+
+

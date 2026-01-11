@@ -25,7 +25,7 @@ export default function ProjectItem({ project, artworkImages, isFirstProject = f
   ) : null;
 
   const textContent = (
-    <Link key="text" href={slug ? `/work/${slug}` : '#'} className="project-link">
+    <Link key="text" href={slug ? `/project/${slug}` : '#'} className="project-link">
       <div className="project-item">{name}</div>
       {descriptionHtml}
     </Link>
