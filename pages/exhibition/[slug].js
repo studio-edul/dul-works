@@ -107,7 +107,7 @@ export default function ExhibitionDetail({ exhibition }) {
       <div className="artwork-detail-container">
         {/* 1번째 열: 텍스트 정보 */}
         <div className="artwork-detail-text-column">
-          <div className="artwork-detail-name">{exhibition.name}</div>
+          <h2 className="artwork-detail-name">{exhibition.name}</h2>
           
           {/* Period와 Description EN */}
           {(exhibition.period || exhibition.description) && (
@@ -167,7 +167,7 @@ export default function ExhibitionDetail({ exhibition }) {
           
           {/* ARTWORKS 섹션 */}
           <div className="exhibition-detail-artworks-section">
-            <div className="exhibition-detail-artworks-title">ARTWORKS</div>
+            <h3 className="exhibition-detail-artworks-title">ARTWORKS</h3>
             {exhibition.artworks && Array.isArray(exhibition.artworks) && exhibition.artworks.length > 0 && (
               <div className="exhibition-detail-artworks-list">
                 {exhibition.artworks.map((artwork, idx) => (
@@ -178,7 +178,7 @@ export default function ExhibitionDetail({ exhibition }) {
                   >
                     <div className="exhibition-detail-artwork-metadata">
                       <div className="exhibition-detail-artwork-name-wrapper">
-                        <div className="exhibition-detail-artwork-name">{artwork.name}</div>
+                        <h4 className="exhibition-detail-artwork-name">{artwork.name}</h4>
                       </div>
                       {artwork.artist && (
                         <div className="exhibition-detail-artwork-artist">{artwork.artist}</div>
@@ -199,7 +199,7 @@ export default function ExhibitionDetail({ exhibition }) {
           {/* Related Text 섹션 */}
           {exhibition.relatedTexts && exhibition.relatedTexts.length > 0 && (
             <div className="exhibition-detail-related-text">
-              <div className="artwork-detail-name">Related Text</div>
+              <h2 className="artwork-detail-name">Related Text</h2>
               <div className="exhibition-detail-related-links">
                 {exhibition.relatedTexts.map((relatedText, idx) => (
                   <div key={idx} className="exhibition-detail-related-link-wrapper">
@@ -266,35 +266,6 @@ export default function ExhibitionDetail({ exhibition }) {
                   className="artwork-detail-image"
                   loading={idx === 0 ? undefined : "lazy"}
                   priority={idx === 0}
-                  quality={90}
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    cursor: 'pointer',
-                  }}
-                />
-              </div>
-            );
-          })}
-        </div>
-        
-        {/* 반응형: 2열 레이아웃용 이미지 컬럼 (1024px 미만) */}
-        <div className="artwork-detail-column artwork-detail-column-responsive">
-          {allImages.map((image, idx) => {
-            const imageIndex = sortedImages.findIndex(img => img.path === image.path);
-            return (
-              <div 
-                key={idx} 
-                className="artwork-detail-image-wrapper"
-                onClick={() => handleImageClick(imageIndex)}
-              >
-                <Image
-                  src={image.path}
-                  alt={`${exhibition.name} - Image ${image.row}`}
-                  width={500}
-                  height={500}
-                  className="artwork-detail-image"
-                  loading="lazy"
                   quality={90}
                   style={{
                     width: '100%',

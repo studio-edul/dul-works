@@ -105,7 +105,7 @@ export default function ArtworkDetail({ artwork }) {
       <div className="artwork-detail-container">
         {/* 1번째 열: 텍스트 정보 */}
         <div className="artwork-detail-text-column">
-          <div className="artwork-detail-name">{artwork.name}</div>
+          <h2 className="artwork-detail-name">{artwork.name}</h2>
           {(artwork.artist || artwork.timeline || artwork.caption) && (
             <div className="artwork-detail-metadata">
               {artwork.artist && (

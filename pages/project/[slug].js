@@ -1,11 +1,18 @@
 import Layout from '../../components/Layout';
 import { useState, useEffect } from 'react';
+import React from 'react';
 import { getProjectBySlug, getAllProjectSlugs } from '../../lib/project-data';
+import ImageWithOverlay from '../../components/ImageWithOverlay';
 
-export default function ProjectDetail({ project, slug }) {
+export default function ProjectDetail({ project, slug, newbornArtworks }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [pinModal, setPinModal] = useState({ open: false, title: '', coord: '' });
+  const [activeRegion, setActiveRegion] = useState('KR');
+  const [imageSliderPosition, setImageSliderPosition] = useState(50);
+  const [isImageDragging, setIsImageDragging] = useState(false);
+  const [imageSliderPosition2, setImageSliderPosition2] = useState(50);
+  const [isImageDragging2, setIsImageDragging2] = useState(false);
 
   if (!project) {
     return (
@@ -55,6 +62,85 @@ export default function ProjectDetail({ project, slug }) {
     }
   }, [isDragging]);
 
+  // Image slider handlers
+  const handleImageSliderMove = (clientX) => {
+    const slider = document.getElementById('image-slider-overlay');
+    if (!slider) return;
+    
+    const rect = slider.getBoundingClientRect();
+    let pos = clientX - rect.left;
+    if (pos < 0) pos = 0;
+    if (pos > rect.width) pos = rect.width;
+    
+    const percent = (pos / rect.width) * 100;
+    setImageSliderPosition(percent);
+  };
+
+  const handleImageMouseDown = (e) => {
+    setIsImageDragging(true);
+    handleImageSliderMove(e.clientX);
+  };
+
+  const handleImageMouseMove = (e) => {
+    if (isImageDragging) {
+      handleImageSliderMove(e.clientX);
+    }
+  };
+
+  const handleImageMouseUp = () => {
+    setIsImageDragging(false);
+  };
+
+  useEffect(() => {
+    if (isImageDragging) {
+      window.addEventListener('mousemove', handleImageMouseMove);
+      window.addEventListener('mouseup', handleImageMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleImageMouseMove);
+        window.removeEventListener('mouseup', handleImageMouseUp);
+      };
+    }
+  }, [isImageDragging]);
+
+  const handleImageSliderMove2 = (clientX) => {
+    const slider = document.getElementById('image-slider-overlay-2');
+    if (!slider) return;
+    
+    const rect = slider.getBoundingClientRect();
+    let pos = clientX - rect.left;
+    if (pos < 0) pos = 0;
+    if (pos > rect.width) pos = rect.width;
+    
+    const percent = (pos / rect.width) * 100;
+    setImageSliderPosition2(percent);
+  };
+
+  const handleImageMouseDown2 = (e) => {
+    setIsImageDragging2(true);
+    handleImageSliderMove2(e.clientX);
+  };
+
+  const handleImageMouseMove2 = (e) => {
+    if (isImageDragging2) {
+      handleImageSliderMove2(e.clientX);
+    }
+  };
+
+  const handleImageMouseUp2 = () => {
+    setIsImageDragging2(false);
+  };
+
+  useEffect(() => {
+    if (isImageDragging2) {
+      window.addEventListener('mousemove', handleImageMouseMove2);
+      window.addEventListener('mouseup', handleImageMouseUp2);
+      return () => {
+        window.removeEventListener('mousemove', handleImageMouseMove2);
+        window.removeEventListener('mouseup', handleImageMouseUp2);
+      };
+    }
+  }, [isImageDragging2]);
+
   const openPin = (title, coord) => {
     setPinModal({ open: true, title, coord });
   };
@@ -63,7 +149,7 @@ export default function ProjectDetail({ project, slug }) {
     setPinModal({ open: false, title: '', coord: '' });
   };
 
-  const { sections, footer } = project;
+  const { sections } = project;
   const isNewbornSpace = slug === 'newborn-space';
 
   return (
@@ -131,111 +217,389 @@ export default function ProjectDetail({ project, slug }) {
                       The project performs systematic version control based on data collection methods, model structures, and input audio characteristics. Each version number represents: <span>Major (structural transitions), Minor (gradual improvements), and Patch (detailed modifications).</span> As data accumulates and the model improves through repetitive learning, a more concrete form of 'Newborn Space' is being realized, and <span>each version clearly records this process of technological evolution.</span>
                     </p>
                   </div>
-                  <div className="project-detail-newborn-versions-wrapper">
-                    <div className="project-detail-newborn-version-item">
-                      <div className="project-detail-newborn-version-year">2023</div>
-                      <h3 className="project-detail-newborn-version">Version 1.x</h3>
-                      <div className="project-detail-newborn-version-details">
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">Data Collection</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>4x Action Cameras (Panoramic Setup)</li>
-                            <li>Ambisonic Audio Recorder</li>
-                          </ul>
-                        </div>
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">AI Model</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>Base : pix2pix</li>
-                            <li>Dataset : Small Scale</li>
-                          </ul>
-                        </div>
+                </div>
+              </section>
+              <div className="project-detail-newborn-versions-wrapper">
+                <div className="project-detail-newborn-version-item">
+                  <div className="project-detail-newborn-version-year">2023</div>
+                  <div className="project-detail-newborn-version-content">
+                    <h3 className="project-detail-newborn-version">Version 1.x</h3>
+                    <div className="project-detail-newborn-version-details">
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">Data Collection</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>4x Action Cameras (Panoramic Setup)</li>
+                          <li>Ambisonic Audio Recorder</li>
+                        </ul>
                       </div>
-                      <p className="project-detail-newborn-version-description">
-                        As the project's initial iteration, audiovisual data was collected using four action cameras arranged in a panoramic configuration alongside an ambisonic spatial audio recorder. By training a pix2pix-based model on a limited dataset, this stage experimented with the feasibility of sound-to-image translation.
-                      </p>
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">AI Model</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>Base : pix2pix</li>
+                          <li>Dataset : Small Scale</li>
+                        </ul>
+                      </div>
                     </div>
-                    <div className="project-detail-newborn-version-item">
-                      <div className="project-detail-newborn-version-year">2024</div>
-                      <h3 className="project-detail-newborn-version">Version 2.0.x</h3>
-                      <div className="project-detail-newborn-version-details">
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">Data Collection</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>360° Camera</li>
-                            <li>Ambisonic Audio Recorder</li>
-                          </ul>
-                        </div>
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">AI Model</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>Base : pix2pix</li>
-                            <li>Dataset : Expanded</li>
-                          </ul>
-                        </div>
+                    <p className="project-detail-newborn-version-description">
+                      As the project's initial iteration, audiovisual data was collected using four action cameras arranged in a panoramic configuration alongside an ambisonic spatial audio recorder. By training a pix2pix-based model on a limited dataset, this stage experimented with the feasibility of sound-to-image translation.
+                    </p>
+                  </div>
+                </div>
+                <div className="project-detail-newborn-version-item">
+                  <div className="project-detail-newborn-version-year">2024</div>
+                  <div className="project-detail-newborn-version-content">
+                    <h3 className="project-detail-newborn-version">Version 2.0.x</h3>
+                    <div className="project-detail-newborn-version-details">
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">Data Collection</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>360° Camera</li>
+                          <li>Ambisonic Audio Recorder</li>
+                        </ul>
                       </div>
-                      <p className="project-detail-newborn-version-description">
-                        The utilization of a 360-degree camera enabled the acquisition of spatial data where image and sound are more seamlessly integrated. This version leveraged a significantly expanded dataset for training compared to the previous iteration.
-                      </p>
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">AI Model</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>Base : pix2pix</li>
+                          <li>Dataset : Expanded</li>
+                        </ul>
+                      </div>
                     </div>
-                    <div className="project-detail-newborn-version-item project-detail-newborn-version-item-active">
-                      <div className="project-detail-newborn-version-year">2025 - Now</div>
-                      <h3 className="project-detail-newborn-version">Version 2.1.x</h3>
-                      <div className="project-detail-newborn-version-details">
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">Data Collection</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>360° Camera</li>
-                            <li>Ambisonic Audio Recorder</li>
-                          </ul>
-                        </div>
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">AI Model</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>Base : Modified pix2pix</li>
-                            <li>Dataset : Expanded</li>
-                          </ul>
-                        </div>
+                    <p className="project-detail-newborn-version-description">
+                      The utilization of a 360-degree camera enabled the acquisition of spatial data where image and sound are more seamlessly integrated. This version leveraged a significantly expanded dataset for training compared to the previous iteration.
+                    </p>
+                  </div>
+                </div>
+                <div className="project-detail-newborn-version-item project-detail-newborn-version-item-active">
+                  <div className="project-detail-newborn-version-year">2025 - Now</div>
+                  <div className="project-detail-newborn-version-content">
+                    <h3 className="project-detail-newborn-version">Version 2.1.x</h3>
+                    <div className="project-detail-newborn-version-details">
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">Data Collection</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>360° Camera</li>
+                          <li>Ambisonic Audio Recorder</li>
+                        </ul>
                       </div>
-                      <p className="project-detail-newborn-version-description">
-                        The pix2pix model was adapted to be optimized for training on 360-degree Equirectangular Images, accompanied by a fundamental restructuring of the input data format. By converting audio Mel Spectrograms into the equirectangular format for training, this version establishes a methodology that directly maps the auditory characteristics of sound onto spatial information.
-                      </p>
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">AI Model</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>Base : Modified pix2pix</li>
+                          <li>Dataset : Expanded</li>
+                        </ul>
+                      </div>
                     </div>
-                    <div className="project-detail-newborn-version-item">
-                      <div className="project-detail-newborn-version-year">In Development</div>
-                      <h3 className="project-detail-newborn-version">Version 3.x</h3>
-                      <div className="project-detail-newborn-version-details">
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">Focus</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>Spatial Dimensionality</li>
-                          </ul>
+                    <p className="project-detail-newborn-version-description">
+                      The pix2pix model was adapted to be optimized for training on 360-degree Equirectangular Images, accompanied by a fundamental restructuring of the input data format. By converting audio Mel Spectrograms into the equirectangular format for training, this version establishes a methodology that directly maps the auditory characteristics of sound onto spatial information.
+                    </p>
+                  </div>
+                </div>
+                <div className="project-detail-newborn-version-item">
+                  <div className="project-detail-newborn-version-year">In Development</div>
+                  <div className="project-detail-newborn-version-content">
+                    <h3 className="project-detail-newborn-version">Version 3.x</h3>
+                    <div className="project-detail-newborn-version-details">
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">Focus</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>Spatial Dimensionality</li>
+                        </ul>
+                      </div>
+                      <div className="project-detail-newborn-version-column">
+                        <h4 className="project-detail-newborn-version-label">Approach</h4>
+                        <ul className="project-detail-newborn-version-list">
+                          <li>3D Scanning & 2D to 3D Conversion</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <p className="project-detail-newborn-version-description">
+                      Focusing on spatial dimensionalization as a core objective, future research will explore methods to convey the sound-generated 'Newborn Space' with three-dimensional depth and volumetric presence.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="project-detail-newborn-section-wrapper">
+              <section className="project-detail-newborn-section">
+                <h2 className="project-detail-newborn-title">CURRENT WORKFLOW</h2>
+                <div className="project-detail-newborn-content">
+                  {/* 텍스트 내용은 추후 추가 */}
+                </div>
+              </section>
+              <div className="project-detail-newborn-data-collection-wrapper">
+                <h3 className="project-detail-newborn-data-collection">01. DATA COLLECTION</h3>
+                <div className="project-detail-newborn-workflow-content">
+                  <div className="project-detail-newborn-workflow-row">
+                    <div className="project-detail-newborn-workflow-left">
+                      <p className="project-detail-newborn-workflow-text">
+                        Audiovisual data for AI training is collected using 360-degree cameras and spatial audio recorders. 
+                        Please drag the map on the right to explore the data.
+                      </p>
+                      <div className="project-detail-newborn-stats-wrapper">
+                        <div className="project-detail-newborn-stat-item">
+                          <span className="project-detail-newborn-stat">TOTAL LOCATION</span>
+                          <span className="project-detail-newborn-stat-value"><strong>194</strong></span>
                         </div>
-                        <div className="project-detail-newborn-version-column">
-                          <h4 className="project-detail-newborn-version-label">Approach</h4>
-                          <ul className="project-detail-newborn-version-list">
-                            <li>3D Scanning & 2D to 3D Conversion</li>
-                          </ul>
+                        <div className="project-detail-newborn-stat-item">
+                          <span className="project-detail-newborn-stat">REGIONS</span>
+                          <span className="project-detail-newborn-stat-value">
+                            <span 
+                              className={`project-detail-newborn-region ${activeRegion === 'KR' ? 'project-detail-newborn-region-active' : ''}`}
+                              onClick={() => setActiveRegion('KR')}
+                            >KR</span>
+                            <span 
+                              className={`project-detail-newborn-region ${activeRegion === 'JP' ? 'project-detail-newborn-region-active' : ''}`}
+                              onClick={() => setActiveRegion('JP')}
+                            >JP</span>
+                            <span 
+                              className={`project-detail-newborn-region ${activeRegion === 'FR' ? 'project-detail-newborn-region-active' : ''}`}
+                              onClick={() => setActiveRegion('FR')}
+                            >FR</span>
+                            <span 
+                              className={`project-detail-newborn-region ${activeRegion === 'DE' ? 'project-detail-newborn-region-active' : ''}`}
+                              onClick={() => setActiveRegion('DE')}
+                            >DE</span>
+                            <span 
+                              className={`project-detail-newborn-region ${activeRegion === 'NL' ? 'project-detail-newborn-region-active' : ''}`}
+                              onClick={() => setActiveRegion('NL')}
+                            >NL</span>
+                          </span>
                         </div>
                       </div>
-                      <p className="project-detail-newborn-version-description">
-                        Focusing on spatial dimensionalization as a core objective, future research will explore methods to convey the sound-generated 'Newborn Space' with three-dimensional depth and volumetric presence.
+                    </div>
+                    <div className="project-detail-newborn-workflow-rectangle"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="project-detail-newborn-data-collection-wrapper">
+                <h3 className="project-detail-newborn-data-collection">02. DATA PRE-PROCESS</h3>
+                <div className="project-detail-newborn-workflow-content">
+                  <div className="project-detail-newborn-workflow-row">
+                    <div className="project-detail-newborn-workflow-text-column">
+                      <p className="project-detail-newborn-workflow-description">
+                        The collected 360-degree Ambisonic audio is separated by direction, converted into Mel Spectrograms, and processed into tensor formats optimized for AI training. Specifically, Spherical Coordinate Mapping is applied to preserve spatial acoustic information. This design enables the AI to precisely learn the correspondence between sound characteristics—across the entire frequency spectrum—and their specific visual locations and elements.
                       </p>
+                      <div className="project-detail-newborn-workflow-approach-wrapper">
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="project-detail-newborn-workflow-approach-image"></div>
+                          <div 
+                            className="project-detail-newborn-image-overlay"
+                            id="image-slider-overlay-2"
+                            onMouseDown={handleImageMouseDown2}
+                            style={{ cursor: isImageDragging2 ? 'col-resize' : 'col-resize' }}
+                          >
+                            <div className="project-detail-newborn-image-bottom"></div>
+                            <div 
+                              className="project-detail-newborn-image-top"
+                              style={{ clipPath: `polygon(0 0, ${imageSliderPosition2}% 0, ${imageSliderPosition2}% 100%, 0 100%)` }}
+                            ></div>
+                            <div 
+                              className="project-detail-newborn-image-slider"
+                              style={{ left: `${imageSliderPosition2}%` }}
+                            >
+                              <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-left"></div>
+                              <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-right"></div>
+                            </div>
+                          </div>
+                          <div className="project-detail-newborn-image-labels">
+                            <span className="project-detail-newborn-image-label-text">Before</span>
+                            <span className="project-detail-newborn-image-label-text">After</span>
+                          </div>
+                        </div>
+                        <div className="project-detail-newborn-workflow-approach">
+                        <h3 className="project-detail-newborn-workflow-approach-title">Current Approach (v2.1.x)</h3>
+                        <div className="project-detail-newborn-workflow-approach-section">
+                          <h4 className="project-detail-newborn-workflow-approach-section-title">Ambisonics Processing</h4>
+                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                            <ul className="project-detail-newborn-workflow-approach-list">
+                              <li>Ambisonics A-format → B-format Conversion</li>
+                              <li>Audio Normalization</li>
+                              <li>Channel Alignment</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="project-detail-newborn-workflow-approach-section">
+                          <h4 className="project-detail-newborn-workflow-approach-section-title">Directional Audio Extraction</h4>
+                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                            <ul className="project-detail-newborn-workflow-approach-list">
+                              <li>Extract Audio by Direction (0°~360°)</li>
+                              <li>Spatial Audio Decomposition</li>
+                              <li>Generate Directional Audio Signal</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="project-detail-newborn-workflow-approach-section">
+                          <h4 className="project-detail-newborn-workflow-approach-section-title">Mel-Spectrogram Conversion</h4>
+                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                            <ul className="project-detail-newborn-workflow-approach-list">
+                              <li>Time-Frequency Transformation per Direction</li>
+                              <li>Mel-scale Frequency Mapping</li>
+                              <li>Generated Spectrograms for Each Direction</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="project-detail-newborn-workflow-approach-section">
+                          <h4 className="project-detail-newborn-workflow-approach-section-title">Spherical Coordinate Mapping</h4>
+                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                            <ul className="project-detail-newborn-workflow-approach-list">
+                              <li>Map audio energy to spherical grid</li>
+                              <li>Coordinates: (θ: Azimuth, φ: Elevation)</li>
+                              <li>Energy distribution per direction</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="project-detail-newborn-workflow-approach-section">
+                          <h4 className="project-detail-newborn-workflow-approach-section-title">Frequency Layer Stacking</h4>
+                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                            <ul className="project-detail-newborn-workflow-approach-list">
+                              <li>Divide into multiple frequency bands</li>
+                              <li>Stack as multi-layer tensor</li>
+                              <li>Each layer = Enerfy at one frequency band</li>
+                            </ul>
+                          </div>
+                        </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </section>
+              </div>
+              <div className="project-detail-newborn-data-collection-wrapper">
+                <h3 className="project-detail-newborn-data-collection">03. AI TRAINING</h3>
+                <div className="project-detail-newborn-workflow-content">
+                  <div className="project-detail-newborn-workflow-row">
+                    <div className="project-detail-newborn-workflow-text-column">
+                      <p className="project-detail-newborn-workflow-description">
+                        During the training process, the AI iteratively learns from preprocessed audio-image pairs to identify correlations between auditory and visual information. The model establishes a translation system that interprets frequency distribution, spatial directionality, and temporal changes as spatial form, color, and texture. This methodology is continuously refined through improvements in data structures and model architecture.
+                      </p>
+                      <div 
+                        className="project-detail-newborn-image-overlay"
+                        id="image-slider-overlay"
+                        onMouseDown={handleImageMouseDown}
+                        style={{ cursor: isImageDragging ? 'col-resize' : 'col-resize' }}
+                      >
+                        <div className="project-detail-newborn-image-bottom"></div>
+                        <div 
+                          className="project-detail-newborn-image-top"
+                          style={{ clipPath: `polygon(0 0, ${imageSliderPosition}% 0, ${imageSliderPosition}% 100%, 0 100%)` }}
+                        ></div>
+                        <div 
+                          className="project-detail-newborn-image-slider"
+                          style={{ left: `${imageSliderPosition}%` }}
+                        >
+                          <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-left"></div>
+                          <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-right"></div>
+                        </div>
+                      </div>
+                      <div className="project-detail-newborn-image-labels">
+                        <span className="project-detail-newborn-image-label-text">Before</span>
+                        <span className="project-detail-newborn-image-label-text">After</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <section className="project-detail-newborn-section">
-              <h2 className="project-detail-newborn-title">CURRENT WORKFLOW</h2>
-              <div className="project-detail-newborn-content">
-                {/* 텍스트 내용은 추후 추가 */}
-              </div>
-            </section>
-            <section className="project-detail-newborn-section">
               <h2 className="project-detail-newborn-title">ARTWORKS</h2>
-              <div className="project-detail-newborn-content">
-                {/* 텍스트 내용은 추후 추가 */}
+              <div className="project-detail-newborn-content project-detail-newborn-artworks-content">
+                {newbornArtworks && newbornArtworks.length > 0 ? (() => {
+                  const columnArrays = {
+                    1: [],
+                    2: []
+                  };
+                  const fullWidthImages = [];
+                  let imageCount = 0;
+
+                  newbornArtworks.forEach((imageData) => {
+                    if (!imageData.url || imageData.url === '') return;
+
+                    const shouldHavePriority = imageCount < 3;
+                    imageCount++;
+
+                    if (!imageData.index) {
+                      // Index가 없는 이미지는 왼쪽 열에 순서대로 추가
+                      columnArrays[1].push(
+                        <ImageWithOverlay
+                          key={`${imageData.url}-${imageData.index || 'default'}`}
+                          imageUrl={imageData.url}
+                          name={imageData.name}
+                          timeline={imageData.timeline}
+                          description={imageData.description}
+                          priority={shouldHavePriority}
+                        />
+                      );
+                      return;
+                    }
+
+                    const indexStr = imageData.index.toString().trim();
+                    if (indexStr.toLowerCase() === 'full') {
+                      fullWidthImages.push(
+                        <ImageWithOverlay
+                          key={`${imageData.url}-full`}
+                          imageUrl={imageData.url}
+                          name={imageData.name}
+                          timeline={imageData.timeline}
+                          description={imageData.description}
+                          isFullWidth={true}
+                          priority={shouldHavePriority}
+                        />
+                      );
+                      return;
+                    }
+
+                    // 콤마로 분리하고 각 부분의 공백 제거
+                    const parts = indexStr.split(',').map(part => part.trim()).filter(part => part !== '');
+                    if (parts.length >= 2) {
+                      const column = parseInt(parts[0], 10);
+                      const row = parseInt(parts[1], 10);
+
+                      if (!isNaN(column) && !isNaN(row) && (column === 1 || column === 2)) {
+                        const imageWithOverlay = (
+                          <ImageWithOverlay
+                            key={`${imageData.url}-${column}-${row}`}
+                            imageUrl={imageData.url}
+                            name={imageData.name}
+                            timeline={imageData.timeline}
+                            description={imageData.description}
+                            priority={shouldHavePriority}
+                          />
+                        );
+
+                        // ARTWORKS 섹션에는 텍스트가 없으므로 row를 그대로 사용
+                        const actualRow = row;
+
+                        while (columnArrays[column].length < actualRow) {
+                          columnArrays[column].push(null);
+                        }
+
+                        columnArrays[column][actualRow - 1] = imageWithOverlay;
+                      }
+                    }
+                  });
+
+                  const leftColumnContent = columnArrays[1].filter(img => img !== null);
+                  const rightColumnContent = columnArrays[2].filter(img => img !== null);
+
+                  return (
+                    <div className="project-detail-newborn-artworks">
+                      <div className="columns-container">
+                        <div className="column">
+                          {leftColumnContent}
+                        </div>
+                        <div className="column">
+                          {rightColumnContent}
+                        </div>
+                      </div>
+                      {fullWidthImages.length > 0 && (
+                        <div className="full-width-images-wrapper">
+                          {fullWidthImages}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })() : null}
               </div>
             </section>
           </div>
@@ -465,22 +829,6 @@ export default function ProjectDetail({ project, slug }) {
           </section>
         )}
 
-        {/* Footer */}
-        {footer && (
-          <footer className="project-detail-footer">
-            <div className="project-detail-footer-content">
-              <h3 className="project-detail-mono">{footer.office}</h3>
-              <p className="project-detail-footer-text">
-                {footer.text.split('\n').map((line, idx) => (
-                  <span key={idx}>
-                    {line}
-                    {idx < footer.text.split('\n').length - 1 && <br />}
-                  </span>
-                ))}
-              </p>
-            </div>
-          </footer>
-        )}
       </div>
     </Layout>
   );
@@ -505,11 +853,53 @@ export async function getStaticProps({ params }) {
       notFound: true
     };
   }
+
+  let newbornArtworks = [];
+  
+  // newborn-space 페이지인 경우 artwork 데이터 가져오기
+  if (params.slug === 'newborn-space') {
+    try {
+      const { getARTWORKDataServer, getWORKDataServer } = await import('../../lib/notion-api-server');
+      const { loadArtworkImagesForProject } = await import('../../lib/artwork-processor');
+      const { processWorkData } = await import('../../lib/work-processor');
+      
+      const [workData, artworkData] = await Promise.all([
+        getWORKDataServer(),
+        getARTWORKDataServer()
+      ]);
+      
+      const projects = processWorkData(workData);
+      const projectNames = projects.map(p => p.name).filter(Boolean);
+      
+      // 프로젝트 이름에서 "newborn"이 포함된 것 찾기
+      const newbornProject = projectNames.find(name => 
+        name && name.toLowerCase().includes('newborn')
+      );
+      
+      if (newbornProject) {
+        newbornArtworks = await loadArtworkImagesForProject(newbornProject, artworkData, projectNames);
+      } else {
+        // 프로젝트 이름을 찾지 못한 경우 여러 가능한 이름으로 시도
+        const possibleNames = ['NEWBORN SPACE', '신생공NEWBORN SPACE', 'Newborn Space', 'newborn space'];
+        for (const projectName of possibleNames) {
+          const artworks = await loadArtworkImagesForProject(projectName, artworkData, projectNames);
+          if (artworks.length > 0) {
+            newbornArtworks = artworks;
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Artwork 데이터 로드 오류:', error);
+      newbornArtworks = [];
+    }
+  }
   
   return {
     props: {
       project,
-      slug: params.slug
+      slug: params.slug,
+      newbornArtworks
     }
   };
 }

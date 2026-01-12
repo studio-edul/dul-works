@@ -36,7 +36,7 @@ export default function WorkContent({ view, projects, artworkMap, exhibitions, t
       return (
         <div className="columns-container">
           <div className="column">
-            <div className="exhibition-name">전시 데이터가 없습니다.</div>
+            <h2 className="exhibition-name">전시 데이터가 없습니다.</h2>
           </div>
           <div className="column"></div>
         </div>
