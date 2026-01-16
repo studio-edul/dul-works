@@ -26,12 +26,12 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
   const handleSliderMove = (clientX) => {
     const slider = document.getElementById('project-slider');
     if (!slider) return;
-    
+
     const rect = slider.getBoundingClientRect();
     let pos = clientX - rect.left;
     if (pos < 0) pos = 0;
     if (pos > rect.width) pos = rect.width;
-    
+
     const percent = (pos / rect.width) * 100;
     setSliderPosition(percent);
   };
@@ -66,12 +66,12 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
   const handleImageSliderMove = (clientX) => {
     const slider = document.getElementById('image-slider-overlay');
     if (!slider) return;
-    
+
     const rect = slider.getBoundingClientRect();
     let pos = clientX - rect.left;
     if (pos < 0) pos = 0;
     if (pos > rect.width) pos = rect.width;
-    
+
     const percent = (pos / rect.width) * 100;
     setImageSliderPosition(percent);
   };
@@ -105,12 +105,12 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
   const handleImageSliderMove2 = (clientX) => {
     const slider = document.getElementById('image-slider-overlay-2');
     if (!slider) return;
-    
+
     const rect = slider.getBoundingClientRect();
     let pos = clientX - rect.left;
     if (pos < 0) pos = 0;
     if (pos > rect.width) pos = rect.width;
-    
+
     const percent = (pos / rect.width) * 100;
     setImageSliderPosition2(percent);
   };
@@ -333,7 +333,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                   <div className="project-detail-newborn-workflow-row">
                     <div className="project-detail-newborn-workflow-left">
                       <p className="project-detail-newborn-workflow-text">
-                        Audiovisual data for AI training is collected using 360-degree cameras and spatial audio recorders. 
+                        Audiovisual data for AI training is collected using 360-degree cameras and spatial audio recorders.
                         Please drag the map on the right to explore the data.
                       </p>
                       <div className="project-detail-newborn-stats-wrapper">
@@ -344,23 +344,23 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                         <div className="project-detail-newborn-stat-item">
                           <span className="project-detail-newborn-stat">REGIONS</span>
                           <span className="project-detail-newborn-stat-value">
-                            <span 
+                            <span
                               className={`project-detail-newborn-region ${activeRegion === 'KR' ? 'project-detail-newborn-region-active' : ''}`}
                               onClick={() => setActiveRegion('KR')}
                             >KR</span>
-                            <span 
+                            <span
                               className={`project-detail-newborn-region ${activeRegion === 'JP' ? 'project-detail-newborn-region-active' : ''}`}
                               onClick={() => setActiveRegion('JP')}
                             >JP</span>
-                            <span 
+                            <span
                               className={`project-detail-newborn-region ${activeRegion === 'FR' ? 'project-detail-newborn-region-active' : ''}`}
                               onClick={() => setActiveRegion('FR')}
                             >FR</span>
-                            <span 
+                            <span
                               className={`project-detail-newborn-region ${activeRegion === 'DE' ? 'project-detail-newborn-region-active' : ''}`}
                               onClick={() => setActiveRegion('DE')}
                             >DE</span>
-                            <span 
+                            <span
                               className={`project-detail-newborn-region ${activeRegion === 'NL' ? 'project-detail-newborn-region-active' : ''}`}
                               onClick={() => setActiveRegion('NL')}
                             >NL</span>
@@ -368,7 +368,8 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                         </div>
                       </div>
                     </div>
-                    <div className="project-detail-newborn-workflow-rectangle"></div>
+                    <div className="project-detail-newborn-workflow-rectangle">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -383,18 +384,18 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                       <div className="project-detail-newborn-workflow-approach-wrapper">
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div className="project-detail-newborn-workflow-approach-image"></div>
-                          <div 
+                          <div
                             className="project-detail-newborn-image-overlay"
                             id="image-slider-overlay-2"
                             onMouseDown={handleImageMouseDown2}
                             style={{ cursor: isImageDragging2 ? 'col-resize' : 'col-resize' }}
                           >
                             <div className="project-detail-newborn-image-bottom"></div>
-                            <div 
+                            <div
                               className="project-detail-newborn-image-top"
                               style={{ clipPath: `polygon(0 0, ${imageSliderPosition2}% 0, ${imageSliderPosition2}% 100%, 0 100%)` }}
                             ></div>
-                            <div 
+                            <div
                               className="project-detail-newborn-image-slider"
                               style={{ left: `${imageSliderPosition2}%` }}
                             >
@@ -408,57 +409,57 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                           </div>
                         </div>
                         <div className="project-detail-newborn-workflow-approach">
-                        <h3 className="project-detail-newborn-workflow-approach-title">Current Approach (v2.1.x)</h3>
-                        <div className="project-detail-newborn-workflow-approach-section">
-                          <h4 className="project-detail-newborn-workflow-approach-section-title">Ambisonics Processing</h4>
-                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
-                            <ul className="project-detail-newborn-workflow-approach-list">
-                              <li>Ambisonics A-format → B-format Conversion</li>
-                              <li>Audio Normalization</li>
-                              <li>Channel Alignment</li>
-                            </ul>
+                          <h4 className="project-detail-newborn-workflow-approach-title">Current Approach (v2.1.x)</h4>
+                          <div className="project-detail-newborn-workflow-approach-section">
+                            <h4 className="project-detail-newborn-workflow-approach-section-title">Ambisonics Processing</h4>
+                            <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                              <ul className="project-detail-newborn-workflow-approach-list">
+                                <li>Ambisonics A-format → B-format Conversion</li>
+                                <li>Audio Normalization</li>
+                                <li>Channel Alignment</li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
-                        <div className="project-detail-newborn-workflow-approach-section">
-                          <h4 className="project-detail-newborn-workflow-approach-section-title">Directional Audio Extraction</h4>
-                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
-                            <ul className="project-detail-newborn-workflow-approach-list">
-                              <li>Extract Audio by Direction (0°~360°)</li>
-                              <li>Spatial Audio Decomposition</li>
-                              <li>Generate Directional Audio Signal</li>
-                            </ul>
+                          <div className="project-detail-newborn-workflow-approach-section">
+                            <h4 className="project-detail-newborn-workflow-approach-section-title">Directional Audio Extraction</h4>
+                            <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                              <ul className="project-detail-newborn-workflow-approach-list">
+                                <li>Extract Audio by Direction (0°~360°)</li>
+                                <li>Spatial Audio Decomposition</li>
+                                <li>Generate Directional Audio Signal</li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
-                        <div className="project-detail-newborn-workflow-approach-section">
-                          <h4 className="project-detail-newborn-workflow-approach-section-title">Mel-Spectrogram Conversion</h4>
-                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
-                            <ul className="project-detail-newborn-workflow-approach-list">
-                              <li>Time-Frequency Transformation per Direction</li>
-                              <li>Mel-scale Frequency Mapping</li>
-                              <li>Generated Spectrograms for Each Direction</li>
-                            </ul>
+                          <div className="project-detail-newborn-workflow-approach-section">
+                            <h4 className="project-detail-newborn-workflow-approach-section-title">Mel-Spectrogram Conversion</h4>
+                            <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                              <ul className="project-detail-newborn-workflow-approach-list">
+                                <li>Time-Frequency Transformation per Direction</li>
+                                <li>Mel-scale Frequency Mapping</li>
+                                <li>Generated Spectrograms for Each Direction</li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
-                        <div className="project-detail-newborn-workflow-approach-section">
-                          <h4 className="project-detail-newborn-workflow-approach-section-title">Spherical Coordinate Mapping</h4>
-                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
-                            <ul className="project-detail-newborn-workflow-approach-list">
-                              <li>Map audio energy to spherical grid</li>
-                              <li>Coordinates: (θ: Azimuth, φ: Elevation)</li>
-                              <li>Energy distribution per direction</li>
-                            </ul>
+                          <div className="project-detail-newborn-workflow-approach-section">
+                            <h4 className="project-detail-newborn-workflow-approach-section-title">Spherical Coordinate Mapping</h4>
+                            <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                              <ul className="project-detail-newborn-workflow-approach-list">
+                                <li>Map audio energy to spherical grid</li>
+                                <li>Coordinates: (θ: Azimuth, φ: Elevation)</li>
+                                <li>Energy distribution per direction</li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
-                        <div className="project-detail-newborn-workflow-approach-section">
-                          <h4 className="project-detail-newborn-workflow-approach-section-title">Frequency Layer Stacking</h4>
-                          <div className="project-detail-newborn-workflow-approach-list-wrapper">
-                            <ul className="project-detail-newborn-workflow-approach-list">
-                              <li>Divide into multiple frequency bands</li>
-                              <li>Stack as multi-layer tensor</li>
-                              <li>Each layer = Enerfy at one frequency band</li>
-                            </ul>
+                          <div className="project-detail-newborn-workflow-approach-section">
+                            <h4 className="project-detail-newborn-workflow-approach-section-title">Frequency Layer Stacking</h4>
+                            <div className="project-detail-newborn-workflow-approach-list-wrapper">
+                              <ul className="project-detail-newborn-workflow-approach-list">
+                                <li>Divide into multiple frequency bands</li>
+                                <li>Stack as multi-layer tensor</li>
+                                <li>Each layer = Energy at one frequency band</li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
                         </div>
                       </div>
                     </div>
@@ -473,18 +474,18 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                       <p className="project-detail-newborn-workflow-description">
                         During the training process, the AI iteratively learns from preprocessed audio-image pairs to identify correlations between auditory and visual information. The model establishes a translation system that interprets frequency distribution, spatial directionality, and temporal changes as spatial form, color, and texture. This methodology is continuously refined through improvements in data structures and model architecture.
                       </p>
-                      <div 
+                      <div
                         className="project-detail-newborn-image-overlay"
                         id="image-slider-overlay"
                         onMouseDown={handleImageMouseDown}
                         style={{ cursor: isImageDragging ? 'col-resize' : 'col-resize' }}
                       >
                         <div className="project-detail-newborn-image-bottom"></div>
-                        <div 
+                        <div
                           className="project-detail-newborn-image-top"
                           style={{ clipPath: `polygon(0 0, ${imageSliderPosition}% 0, ${imageSliderPosition}% 100%, 0 100%)` }}
                         ></div>
-                        <div 
+                        <div
                           className="project-detail-newborn-image-slider"
                           style={{ left: `${imageSliderPosition}%` }}
                         >
@@ -616,14 +617,14 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                 ))}
               </div>
               <h2 className="project-detail-section-title">{sections.section01.title}</h2>
-              
+
               <div className="project-detail-map-wrapper">
                 <div className="project-detail-map-bg">MAP INTERFACE (Mapbox API Area)</div>
-                
+
                 {sections.section01.mapPins && sections.section01.mapPins.map((pin, idx) => (
-                  <div 
+                  <div
                     key={idx}
-                    className="project-detail-data-pin" 
+                    className="project-detail-data-pin"
                     style={{ top: pin.top, left: pin.left }}
                     onClick={() => openPin(pin.title, pin.coord)}
                   ></div>
@@ -637,7 +638,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                       ▶ Playing YouTube ASMR Video...<br />
                       (Ambisonics 360 Audio)
                     </div>
-                    <button 
+                    <button
                       className="project-detail-modal-close"
                       onClick={closePin}
                     >
@@ -677,8 +678,8 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                   <h3>{sections.section02.inputTitle}</h3>
                   <p className="project-detail-mono">{sections.section02.inputSubtitle}</p>
                   <svg width="100%" height="80" style={{ marginTop: '20px' }}>
-                    <path d="M0,40 Q20,10 40,40 T80,40 T120,40 T160,40" stroke="#444" fill="none" strokeWidth="2"/>
-                    <path d="M0,40 Q10,70 20,40 T40,40 T60,40 T80,40" stroke="#00ff88" fill="none" strokeWidth="2"/>
+                    <path d="M0,40 Q20,10 40,40 T80,40 T120,40 T160,40" stroke="#444" fill="none" strokeWidth="2" />
+                    <path d="M0,40 Q10,70 20,40 T40,40 T60,40 T80,40" stroke="#00ff88" fill="none" strokeWidth="2" />
                   </svg>
                   <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '10px' }}>
                     {sections.section02.inputDescription}
@@ -688,7 +689,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                 <div className="project-detail-process-box">
                   <h3>{sections.section02.outputTitle}</h3>
                   <p className="project-detail-mono">{sections.section02.outputSubtitle}</p>
-                  
+
                   <div className="project-detail-tensor-visualizer">
                     {Array.from({ length: 12 }).map((_, idx) => (
                       <div key={idx} className="project-detail-tensor-cell"></div>
@@ -714,14 +715,14 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                 ))}
               </div>
               <h2 className="project-detail-section-title">{sections.section03.title}</h2>
-              
+
               {sections.section03.code && (
                 <div className="project-detail-code-window">
                   {sections.section03.code.split('\n').map((line, idx) => {
                     // 키워드와 클래스명, 주석을 찾아서 하이라이팅
                     const parts = [];
                     let remaining = line;
-                    
+
                     // 키워드 매칭 (class, def, if, return, self)
                     const keywordRegex = /\b(class|def|if|return|self)\b/;
                     const keywordMatch = remaining.match(keywordRegex);
@@ -731,7 +732,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                       parts.push({ type: 'kwd', content: keywordMatch[0] });
                       remaining = remaining.substring(keywordMatch.index + keywordMatch[0].length);
                     }
-                    
+
                     // 클래스명 매칭
                     const classRegex = /\b(SphereConv2d|CircularPad2d|nn\.Module)\b/;
                     const classMatch = remaining.match(classRegex);
@@ -741,7 +742,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                       parts.push({ type: 'cls', content: classMatch[0] });
                       remaining = remaining.substring(classMatch.index + classMatch[0].length);
                     }
-                    
+
                     // 주석 매칭
                     const commentIndex = remaining.indexOf('#');
                     if (commentIndex >= 0) {
@@ -750,7 +751,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                     } else if (remaining) {
                       parts.push({ type: 'text', content: remaining });
                     }
-                    
+
                     return (
                       <div key={idx}>
                         {parts.length > 0 ? (
@@ -794,8 +795,8 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                 </p>
               )}
 
-              <div 
-                className="project-detail-slider-wrapper" 
+              <div
+                className="project-detail-slider-wrapper"
                 id="project-slider"
                 onMouseDown={handleMouseDown}
                 style={{ cursor: isDragging ? 'col-resize' : 'col-resize' }}
@@ -807,7 +808,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                     </div>
                   )}
                 </div>
-                <div 
+                <div
                   className="project-detail-slide-image project-detail-img-after"
                   style={{ width: `${sliderPosition}%` }}
                 >
@@ -817,8 +818,8 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                     </div>
                   )}
                 </div>
-                
-                <div 
+
+                <div
                   className="project-detail-slider-knob"
                   style={{ left: `${sliderPosition}%` }}
                 >
@@ -835,19 +836,68 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
 }
 
 export async function getStaticPaths() {
-  const slugs = getAllProjectSlugs();
-  
-  return {
-    paths: slugs.map(slug => ({
-      params: { slug }
-    })),
-    fallback: false // 정적 데이터만 사용하므로 false
-  };
+  // 1. 정적 데이터의 slug 가져오기
+  const staticSlugs = getAllProjectSlugs();
+
+  try {
+    // 2. Notion 데이터의 slug 가져오기
+    const { getWORKDataServer } = await import('../../lib/notion-api-server');
+    const { processWorkData } = await import('../../lib/work-processor');
+    const { createSlug } = await import('../../lib/slug-utils');
+
+    const workData = await getWORKDataServer();
+    const projects = processWorkData(workData);
+    const notionSlugs = projects.map(p => createSlug(p.name)).filter(Boolean);
+
+    // 중복 제거 후 합치기
+    const allSlugs = [...new Set([...staticSlugs, ...notionSlugs])];
+
+    return {
+      paths: allSlugs.map(slug => ({
+        params: { slug }
+      })),
+      fallback: 'blocking' // 새로운 데이터가 있을 수 있으므로 blocking
+    };
+  } catch (error) {
+    console.error('getStaticPaths 오류:', error);
+    // 오류 발생 시 정적 데이터만이라도 제공
+    return {
+      paths: staticSlugs.map(slug => ({
+        params: { slug }
+      })),
+      fallback: 'blocking'
+    };
+  }
 }
 
 export async function getStaticProps({ params }) {
-  const project = getProjectBySlug(params.slug);
-  
+  let project = getProjectBySlug(params.slug);
+
+  // 정적 데이터에 없는 경우 Notion에서 검색
+  if (!project) {
+    try {
+      const { getWORKDataServer } = await import('../../lib/notion-api-server');
+      const { processWorkData } = await import('../../lib/work-processor');
+      const { createSlug } = await import('../../lib/slug-utils');
+
+      const workData = await getWORKDataServer();
+      const projects = processWorkData(workData);
+
+      const foundProject = projects.find(p => createSlug(p.name) === params.slug);
+
+      if (foundProject) {
+        // Notion 데이터를 컴포넌트 형식에 맞게 변환
+        project = {
+          name: foundProject.name,
+          description: foundProject.description,
+          sections: {} // 일반 프로젝트는 섹션 정보가 없음
+        };
+      }
+    } catch (error) {
+      console.error('Project Notion search error:', error);
+    }
+  }
+
   if (!project) {
     return {
       notFound: true
@@ -855,37 +905,41 @@ export async function getStaticProps({ params }) {
   }
 
   let newbornArtworks = [];
-  
-  // newborn-space 페이지인 경우 artwork 데이터 가져오기
-  if (params.slug === 'newborn-space') {
+
+  // newborn-space 페이지인 경우 artwork 데이터 가져오기 (기존 로직 유지)
+  // 또는 이름에 'newborn'이 포함된 경우 관련 artwork 가져오기 시도
+  if (params.slug.includes('newborn')) {
     try {
       const { getARTWORKDataServer, getWORKDataServer } = await import('../../lib/notion-api-server');
       const { loadArtworkImagesForProject } = await import('../../lib/artwork-processor');
       const { processWorkData } = await import('../../lib/work-processor');
-      
+
+      // workData가 위에서 이미 로드되었을 수 있지만, 안전하게 다시 로드하거나 캐시 활용
       const [workData, artworkData] = await Promise.all([
         getWORKDataServer(),
         getARTWORKDataServer()
       ]);
-      
+
       const projects = processWorkData(workData);
       const projectNames = projects.map(p => p.name).filter(Boolean);
-      
-      // 프로젝트 이름에서 "newborn"이 포함된 것 찾기
-      const newbornProject = projectNames.find(name => 
-        name && name.toLowerCase().includes('newborn')
-      );
-      
-      if (newbornProject) {
-        newbornArtworks = await loadArtworkImagesForProject(newbornProject, artworkData, projectNames);
+
+      // 현재 프로젝트 이름으로 먼저 시도
+      let artworks = await loadArtworkImagesForProject(project.name, artworkData, projectNames);
+
+      if (artworks.length > 0) {
+        newbornArtworks = artworks;
       } else {
-        // 프로젝트 이름을 찾지 못한 경우 여러 가능한 이름으로 시도
+        // 찾지 못한 경우 'newborn' 키워드로 대안 찾기
         const possibleNames = ['NEWBORN SPACE', '신생공NEWBORN SPACE', 'Newborn Space', 'newborn space'];
         for (const projectName of possibleNames) {
-          const artworks = await loadArtworkImagesForProject(projectName, artworkData, projectNames);
-          if (artworks.length > 0) {
-            newbornArtworks = artworks;
-            break;
+          // 현재 프로젝트와 관련 없는 건 제외해야 하지만, 'newborn' 관련 페이지들이라면 공유할 수도 있음.
+          // 여기선 단순히 newborn-space 특화 로직이었던 것을 조금 확장
+          if (params.slug === 'newborn-space') {
+            const altArtworks = await loadArtworkImagesForProject(projectName, artworkData, projectNames);
+            if (altArtworks.length > 0) {
+              newbornArtworks = altArtworks;
+              break;
+            }
           }
         }
       }
@@ -894,12 +948,13 @@ export async function getStaticProps({ params }) {
       newbornArtworks = [];
     }
   }
-  
+
   return {
     props: {
       project,
       slug: params.slug,
       newbornArtworks
-    }
+    },
+    revalidate: 60
   };
 }

@@ -8,7 +8,7 @@
   --column-width: 595px;
   --column-gap: 10px;
   --full-width-image: calc(var(--column-width) * 2 + var(--column-gap));
-  
+
   /* Spacing */
   --spacing-xs: 5px;
   --spacing-sm: 10px;
@@ -16,11 +16,11 @@
   --spacing-lg: 30px;
   --spacing-xl: 50px;
   --spacing-xxl: 100px;
-  
+
   /* Opacity */
   --opacity-inactive: 0.3;
   --opacity-active: 1;
-  
+
   /* Breakpoints */
   --breakpoint-mobile: 640px;
   --breakpoint-tablet: 1024px;
@@ -116,10 +116,10 @@
   }
 
   .desktop-view {
-    /* display: block; removed to allow flex container to work */
+    /* Rely on accompanying classes (like columns-container) for display property */
   }
 
-  @media (max-width: var(--breakpoint-tablet)) {
+  @media (max-width: 1023px) {
 
     /*
        Previous generic 1-column logic kept for Project/Timeline views
@@ -495,6 +495,12 @@
     align-items: start;
   }
 
+  /* When no second column images, use a 2-column layout for the grid itself - Desktop ONLY */
+  @media (min-width: 1024px) {
+    .artwork-detail-container.no-second-column {
+      grid-template-columns: 1fr 2fr !important;
+    }
+  }
 
   .artwork-detail-text-column {
     @apply flex flex-col text-left;
@@ -513,9 +519,9 @@
   }
 
   /* 1024px 미만: 2열 레이아웃 */
-  @media (max-width: calc(var(--breakpoint-tablet) - 1px)) {
+  @media (max-width: 1023px) {
     .artwork-detail-container {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr) !important;
     }
 
     .artwork-detail-text-column {
@@ -524,8 +530,8 @@
     }
 
     /* 기존 이미지 컬럼들을 숨김 */
-    .artwork-detail-container > .artwork-detail-column-1,
-    .artwork-detail-container > .artwork-detail-column-2 {
+    .artwork-detail-container>.artwork-detail-column-1,
+    .artwork-detail-container>.artwork-detail-column-2 {
       display: none !important;
       visibility: hidden !important;
       opacity: 0 !important;
@@ -537,7 +543,7 @@
     }
 
     /* 반응형 이미지 컬럼 표시 */
-    .artwork-detail-container > .artwork-detail-column-responsive {
+    .artwork-detail-container>.artwork-detail-column-responsive {
       display: flex !important;
       flex-direction: column;
       gap: 10px;
@@ -549,9 +555,10 @@
   }
 
   /* 1024px 이상: 3열 레이아웃 */
-  @media (min-width: var(--breakpoint-tablet)) {
+  @media (min-width: 1024px) {
+
     /* 반응형 이미지 컬럼 숨김 */
-    .artwork-detail-container > .artwork-detail-column-responsive {
+    .artwork-detail-container>.artwork-detail-column-responsive {
       display: none !important;
       visibility: hidden !important;
       opacity: 0 !important;
@@ -561,9 +568,9 @@
   }
 
   /* 640px 미만: 1열 레이아웃 */
-  @media (max-width: calc(var(--breakpoint-mobile) - 1px)) {
+  @media (max-width: 639px) {
     .artwork-detail-container {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr !important;
     }
 
     .artwork-detail-text-column {
@@ -573,8 +580,8 @@
     }
 
     /* 기존 이미지 컬럼들을 완전히 숨김 (그리드에서도 제외) */
-    .artwork-detail-container > .artwork-detail-column-1,
-    .artwork-detail-container > .artwork-detail-column-2 {
+    .artwork-detail-container>.artwork-detail-column-1,
+    .artwork-detail-container>.artwork-detail-column-2 {
       display: none !important;
       visibility: hidden !important;
       opacity: 0 !important;
@@ -586,7 +593,7 @@
     }
 
     /* 반응형 이미지 컬럼만 표시 */
-    .artwork-detail-container > .artwork-detail-column-responsive {
+    .artwork-detail-container>.artwork-detail-column-responsive {
       display: flex !important;
       flex-direction: column;
       gap: 10px;
@@ -607,7 +614,7 @@
     margin-bottom: var(--spacing-md);
   }
 
-  .artwork-detail-artist{
+  .artwork-detail-artist {
     @apply font-sans;
     font-size: 14px;
     opacity: var(--opacity-inactive);
@@ -618,6 +625,14 @@
     @apply font-sans;
     font-size: 14px;
     opacity: var(--opacity-inactive);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .artwork-detail-dimension {
+    @apply font-sans;
+    font-size: 14px;
+    opacity: var(--opacity-inactive);
+    margin-bottom: var(--spacing-xs);
   }
 
   .artwork-detail-caption {
@@ -785,24 +800,24 @@
 
   /* Related Text 페이지 스타일 */
   .related-text-page-container {
-    max-width: 1420px;
+    width: 100%;
     margin: 0 auto;
-    padding: 0 15px;
   }
 
   .related-text-page-title {
     @apply font-sans font-bold;
-    font-size: 20px;
+    font-size: 30px;
     text-align: center;
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: 50px;
   }
 
   .related-text-page-content {
     @apply font-sans;
     font-size: 14px;
     text-align: left;
-    max-width: 800px;
-    margin: 0 auto;
+    /* max-width: 800px; */
+    width: 100%;
+    margin: 0;
   }
 
   .related-text-page-content .artwork-detail-paragraph {
@@ -832,7 +847,8 @@
     line-height: 1.4;
     margin: 0;
     margin-bottom: var(--spacing-sm);
-    white-space: pre-wrap; /* 연속된 공백 유지 */
+    white-space: pre-wrap;
+    /* 연속된 공백 유지 */
   }
 
   .artwork-detail-paragraph:last-child {
@@ -840,7 +856,7 @@
   }
 
   /* 반응형 텍스트 크기 */
-  @media (max-width: calc(var(--breakpoint-tablet) - 1px)) {
+  @media (max-width: 1023px) {
     .artwork-detail-name {
       font-size: 18px;
     }
@@ -854,7 +870,7 @@
     }
   }
 
-  @media (max-width: calc(var(--breakpoint-mobile) - 1px)) {
+  @media (max-width: 639px) {
     .artwork-detail-name {
       font-size: 16px;
     }
@@ -873,12 +889,13 @@
   }
 
   /* 문단 구분(null) 다음 문단은 margin-top 추가하지 않음 (break가 간격 처리) */
-  .artwork-detail-paragraph-break + .artwork-detail-paragraph {
+  .artwork-detail-paragraph-break+.artwork-detail-paragraph {
     margin-top: 0;
   }
 
   .artwork-detail-paragraph-break {
-    height: 0.7em; /* 문단 구분 간격 (두 번 줄바꿈) */
+    height: 0.7em;
+    /* 문단 구분 간격 (두 번 줄바꿈) */
     margin: 0;
   }
 
@@ -886,12 +903,29 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%;
   }
 
-  /* 3번째 열에 이미지가 없을 때 2번째 열 이미지가 2, 3번 열을 합친 크기로 표시 */
-  @media (min-width: var(--breakpoint-tablet)) {
-    .artwork-detail-column-full-width {
-      grid-column: 2 / span 2;
+  /* Desktop Layout (1024px and above) */
+  @media (min-width: 1024px) {
+    .artwork-detail-container>.artwork-detail-text-column {
+      grid-column: 1 !important;
+    }
+
+    .artwork-detail-container>.artwork-detail-column-1 {
+      grid-column: 2 !important;
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    .artwork-detail-container>.artwork-detail-column-2 {
+      grid-column: 3 !important;
+    }
+
+    /* If the container is in 2-column mode, ensure the first column fills its 2fr area */
+    .artwork-detail-container.no-second-column>.artwork-detail-column-1 {
+      grid-column: 2 !important;
+      width: 100% !important;
     }
   }
 
@@ -900,6 +934,15 @@
     line-height: 0;
     cursor: pointer;
     transition: opacity 0.2s ease;
+  }
+
+  .artwork-detail-image-wrapper .overlay-text {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .artwork-detail-image-wrapper:hover .overlay-text {
+    opacity: 1;
   }
 
   .artwork-detail-image-wrapper:hover {
@@ -1028,7 +1071,7 @@
   }
 
   /* 반응형: 모바일 */
-  @media (max-width: calc(var(--breakpoint-mobile) - 1px)) {
+  @media (max-width: 639px) {
     .artwork-image-popup-container {
       max-width: 100vw;
       max-height: 100vh;
@@ -1147,7 +1190,7 @@
     background-color: #f0f0f0;
   }
 
-  @media (max-width: var(--breakpoint-mobile)) {
+  @media (max-width: 640px) {
 
     /* Typography Scaling: 16px -> 14px */
     .nav-item,
@@ -1219,10 +1262,12 @@
   .project-detail-newborn-sections {
     width: 100%;
     margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
   }
 
   .project-detail-newborn-section-wrapper {
-    margin-bottom: var(--spacing-xxl);
     position: relative;
   }
 
@@ -1302,7 +1347,7 @@
   }
 
   .project-detail-newborn-text-group {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: 20px;
   }
 
   .project-detail-newborn-data-collection-wrapper {
@@ -1370,7 +1415,7 @@
     font-size: 14px;
     line-height: 1.4;
     margin: 0;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
   }
 
   .project-detail-newborn-workflow-approach-wrapper {
@@ -1388,7 +1433,7 @@
 
   .project-detail-newborn-workflow-approach {
     @apply font-sans;
-    width: 360px;
+    width: 35%;
     flex-shrink: 0;
   }
 
@@ -1435,7 +1480,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 2 / 1;
-    margin-top: var(--spacing-md);
+    /* margin-top: var(--spacing-md); */
     margin-bottom: var(--spacing-sm);
   }
 
@@ -1591,12 +1636,10 @@
     top: 0;
     bottom: 0;
     width: 1px;
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 1) 56%,
-      rgba(0, 0, 0, 0) 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 1) 56%,
+        rgba(0, 0, 0, 0) 100%);
   }
 
   .project-detail-newborn-version-item {
@@ -1687,10 +1730,13 @@
     display: flex;
     flex-direction: column;
     @apply left-border;
+    flex: 1;
+    /* Equal width */
+    min-width: 0;
+    /* Prevent overflow */
   }
 
   .project-detail-newborn-version-column:first-child {
-    width: 300px;
     margin-right: 15px;
   }
 
@@ -1880,6 +1926,7 @@
       transform: scale(1);
       opacity: 1;
     }
+
     100% {
       transform: scale(3);
       opacity: 0;
@@ -1993,6 +2040,7 @@
     0% {
       opacity: 0.1;
     }
+
     100% {
       opacity: 0.5;
     }
@@ -2135,6 +2183,206 @@
 
     .project-detail-slider-wrapper {
       height: 400px;
+    }
+  }
+
+  /* Responsive Design for Newborn Space */
+  @media (max-width: 1024px) {
+    .project-detail-newborn-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+    }
+
+    .project-detail-newborn-section-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .project-detail-container.newborn-space {
+      padding: 0 40px;
+    }
+
+    .project-detail-newborn-section-wrapper:has(.project-detail-newborn-data-collection-wrapper)::before,
+    .project-detail-newborn-versions-wrapper::before {
+      display: none;
+    }
+
+    .project-detail-newborn-section,
+    .project-detail-newborn-data-collection-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .project-detail-newborn-section {
+      margin-bottom: 0;
+    }
+
+    .project-detail-newborn-data-collection-wrapper {
+      margin-top: 0;
+    }
+
+    .project-detail-newborn-data-collection-wrapper~.project-detail-newborn-data-collection-wrapper {
+      margin-top: 30px;
+    }
+
+    .project-detail-newborn-versions-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .project-detail-newborn-version-item {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 30px;
+    }
+
+    .project-detail-newborn-version-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .project-detail-newborn-workflow-approach-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .project-detail-newborn-title {
+      text-align: left;
+      padding-right: 0;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .project-detail-newborn-data-collection {
+      text-align: left;
+      padding-right: 0;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .project-detail-newborn-version-year {
+      text-align: left;
+      padding-right: 0;
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .project-detail-newborn-content,
+    .project-detail-newborn-workflow-content,
+    .project-detail-newborn-version-content {
+      grid-column: auto;
+      margin-left: 0;
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .project-detail-newborn-text-group {
+      margin-bottom: 20px;
+    }
+
+    .project-detail-newborn-version-column:first-child {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+
+    .project-detail-newborn-workflow-approach {
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Remove bottom margin from sections as gap handles it now */
+    .project-detail-newborn-workflow-approach-section {
+      margin-bottom: 15px;
+    }
+
+    .project-detail-newborn-workflow-approach-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .project-detail-newborn-workflow-approach-title {
+      margin-bottom: 10px;
+    }
+
+    .project-detail-newborn-workflow-approach-wrapper>div:first-child {
+      width: 100%;
+    }
+
+    /* Workflow Layout adjustment for Tablet */
+    .project-detail-newborn-workflow-row {
+      flex-direction: column;
+      margin-bottom: 0;
+    }
+
+    .project-detail-newborn-workflow-left {
+      max-width: 100%;
+      margin-left: 0;
+      margin-bottom: 15px;
+    }
+
+    .project-detail-newborn-workflow-text-column {
+      margin-left: 0;
+    }
+
+    .project-detail-newborn-workflow-text {
+      margin-bottom: 10px;
+    }
+
+    .project-detail-newborn-data-collection::before,
+    .project-detail-newborn-version::before {
+      display: none;
+    }
+
+    .project-detail-newborn-version {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    /* Artwork Grid */
+    .project-detail-newborn-artworks .column {
+      width: 100%;
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .project-detail-newborn-artworks .columns-container {
+      flex-direction: column;
+    }
+
+    /* Reduce font size for section titles on smaller screens */
+    .project-detail-newborn-title {
+      /* font-size: 1.5rem; Removed to match desktop size (20px) */
+    }
+  }
+
+  @media (max-width: 640px) {
+    .project-detail-container.newborn-space {
+      padding: 0 20px;
+    }
+
+    .project-detail-newborn-version-details {
+      flex-direction: column;
+    }
+
+    .project-detail-newborn-workflow-approach-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .project-detail-newborn-workflow-approach {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .project-detail-newborn-workflow-approach-wrapper>div:first-child {
+      width: 100%;
     }
   }
 }

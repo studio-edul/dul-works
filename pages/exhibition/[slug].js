@@ -19,13 +19,13 @@ export default function ExhibitionDetail({ exhibition }) {
 
   // 팝업용: 모든 이미지를 정렬된 순서로
   const sortedImages = exhibition.images || [];
-  
+
   // 이미지를 열별로 그룹화
   const column1Images = (exhibition.images || []).filter(img => img.column === 1);
   const column2Images = (exhibition.images || []).filter(img => img.column === 2);
   // 2열 레이아웃을 위해 모든 이미지 합치기
   const allImages = [...column1Images, ...column2Images];
-  
+
   // 3번째 열에 이미지가 없으면 2번째 열 이미지가 2, 3번 열을 합친 크기로 표시
   const hasColumn2Images = column2Images.length > 0;
 
@@ -104,11 +104,11 @@ export default function ExhibitionDetail({ exhibition }) {
 
   return (
     <Layout title={`Portfolio - ${exhibition.name}`}>
-      <div className="artwork-detail-container">
+      <div className={`artwork-detail-container ${!hasColumn2Images ? 'no-second-column' : ''}`}>
         {/* 1번째 열: 텍스트 정보 */}
         <div className="artwork-detail-text-column">
           <h2 className="artwork-detail-name">{exhibition.name}</h2>
-          
+
           {/* Period와 Description EN */}
           {(exhibition.period || exhibition.description) && (
             <div className="artwork-detail-metadata">
@@ -120,51 +120,48 @@ export default function ExhibitionDetail({ exhibition }) {
               )}
             </div>
           )}
-          
+
           {/* EN 토글 텍스트 */}
-          {exhibition.pageText && (
+          {exhibition.pageText && Array.isArray(exhibition.pageText) && exhibition.pageText.length > 0 ? (
             <div className="artwork-detail-page-text">
-              {Array.isArray(exhibition.pageText) ? (
-                exhibition.pageText.map((paragraph, idx) => {
-                  // 마지막 항목인지 확인
-                  const isLast = idx === exhibition.pageText.length - 1;
-                  
-                  if (paragraph === null) {
-                    // 마지막 항목이면 paragraph-break를 렌더링하지 않음
-                    if (isLast) {
-                      return null;
-                    }
-                    // 문단 구분 (작은 간격)
-                    return <div key={idx} className="artwork-detail-paragraph-break"></div>;
-                  }
-                  
-                  // rich_text 배열인 경우 스타일 적용
-                  if (Array.isArray(paragraph)) {
-                    return (
-                      <p key={idx} className="artwork-detail-paragraph">
-                        {paragraph.map((textItem, textIdx) => {
-                          const text = textItem.plain_text || '';
-                          const annotations = textItem.annotations || {};
-                          
-                          // bold 처리
-                          if (annotations.bold) {
-                            return <strong key={textIdx}>{text}</strong>;
-                          }
-                          return <span key={textIdx}>{text}</span>;
-                        })}
-                      </p>
-                    );
-                  }
-                  
-                  // 문자열인 경우 (하위 호환성)
-                  return <p key={idx} className="artwork-detail-paragraph">{paragraph}</p>;
-                }).filter(item => item !== null) // null 항목 제거
-              ) : (
-                <div>{exhibition.pageText}</div>
-              )}
+              {exhibition.pageText.map((paragraph, idx) => {
+                if (paragraph === null) {
+                  // 문단 구분 (작은 간격)
+                  return <div key={idx} className="artwork-detail-paragraph-break"></div>;
+                }
+
+                // rich_text 배열인 경우 스타일 적용
+                if (Array.isArray(paragraph)) {
+                  return (
+                    <p key={idx} className="artwork-detail-paragraph">
+                      {paragraph.map((textItem, textIdx) => {
+                        const text = textItem.plain_text || '';
+                        const annotations = textItem.annotations || {};
+
+                        // bold 처리
+                        if (annotations.bold) {
+                          return <strong key={textIdx}>{text}</strong>;
+                        }
+                        return <span key={textIdx}>{text}</span>;
+                      })}
+                    </p>
+                  );
+                }
+
+                // 문자열인 경우 (하위 호환성)
+                return <p key={idx} className="artwork-detail-paragraph">{paragraph}</p>;
+              })}
+            </div>
+          ) : exhibition.pageText && !Array.isArray(exhibition.pageText) ? (
+            <div className="artwork-detail-page-text">
+              {exhibition.pageText}
+            </div>
+          ) : (
+            <div className="artwork-detail-page-text">
+              none
             </div>
           )}
-          
+
           {/* ARTWORKS 섹션 */}
           <div className="exhibition-detail-artworks-section">
             <h3 className="exhibition-detail-artworks-title">ARTWORKS</h3>
@@ -195,7 +192,7 @@ export default function ExhibitionDetail({ exhibition }) {
               </div>
             )}
           </div>
-          
+
           {/* Related Text 섹션 */}
           {exhibition.relatedTexts && exhibition.relatedTexts.length > 0 && (
             <div className="exhibition-detail-related-text">
@@ -215,14 +212,14 @@ export default function ExhibitionDetail({ exhibition }) {
             </div>
           )}
         </div>
-        
+
         {/* 2번째 열: column이 1인 이미지들 */}
         <div className={`artwork-detail-column artwork-detail-column-1 ${!hasColumn2Images ? 'artwork-detail-column-full-width' : ''}`}>
           {column1Images.map((image, idx) => {
             const imageIndex = sortedImages.findIndex(img => img.path === image.path);
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="artwork-detail-image-wrapper"
                 onClick={() => handleImageClick(imageIndex)}
                 style={{ gridRow: image.row }}
@@ -246,23 +243,55 @@ export default function ExhibitionDetail({ exhibition }) {
             );
           })}
         </div>
-        
-        {/* 3번째 열: column이 2인 이미지들 */}
-        <div className="artwork-detail-column artwork-detail-column-2">
-          {column2Images.map((image, idx) => {
-            const imageIndex = sortedImages.findIndex(img => img.path === image.path);
+
+        {/* 3번째 열: column이 2인 이미지들 - 이미지가 있을 때만 렌더링 */}
+        {hasColumn2Images && (
+          <div className="artwork-detail-column artwork-detail-column-2">
+            {column2Images.map((image, idx) => {
+              const imageIndex = sortedImages.findIndex(img => img.path === image.path);
+              return (
+                <div
+                  key={idx}
+                  className="artwork-detail-image-wrapper"
+                  onClick={() => handleImageClick(imageIndex)}
+                  style={{ gridRow: image.row }}
+                >
+                  <Image
+                    src={image.path}
+                    alt={`${exhibition.name} - Image ${image.row}`}
+                    width={500}
+                    height={500}
+                    className="artwork-detail-image"
+                    loading={idx === 0 ? undefined : "lazy"}
+                    priority={idx === 0}
+                    quality={90}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      cursor: 'pointer',
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* 반응형 (1024px 미만): 1열로 이미지 표시 */}
+        <div className="artwork-detail-column artwork-detail-column-responsive">
+          {sortedImages.map((image, idx) => {
+            const imageIndex = idx;
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="artwork-detail-image-wrapper"
                 onClick={() => handleImageClick(imageIndex)}
-                style={{ gridRow: image.row }}
               >
                 <Image
                   src={image.path}
-                  alt={`${exhibition.name} - Image ${image.row}`}
-                  width={500}
-                  height={500}
+                  alt={`${exhibition.name} - Image ${idx + 1}`}
+                  width={800}
+                  height={800}
                   className="artwork-detail-image"
                   loading={idx === 0 ? undefined : "lazy"}
                   priority={idx === 0}
@@ -283,14 +312,14 @@ export default function ExhibitionDetail({ exhibition }) {
       {isPopupOpen && sortedImages.length > 0 && (
         <div className="artwork-image-popup-overlay" onClick={closePopup}>
           <div className="artwork-image-popup-container" onClick={(e) => e.stopPropagation()}>
-            <button 
+            <button
               className="artwork-image-popup-close"
               onClick={closePopup}
               aria-label="닫기"
             >
               ×
             </button>
-            <button 
+            <button
               className="artwork-image-popup-nav artwork-image-popup-prev"
               onClick={goToPreviousImage}
               aria-label="이전 이미지"
@@ -302,7 +331,7 @@ export default function ExhibitionDetail({ exhibition }) {
                 height={24}
               />
             </button>
-            <button 
+            <button
               className="artwork-image-popup-nav artwork-image-popup-next"
               onClick={goToNextImage}
               aria-label="다음 이미지"
@@ -338,7 +367,7 @@ export default function ExhibitionDetail({ exhibition }) {
 export async function getStaticPaths() {
   try {
     const slugs = await getAllExhibitionSlugs();
-    
+
     return {
       paths: slugs.map(slug => ({
         params: { slug }
@@ -357,13 +386,13 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   try {
     const exhibition = await getExhibitionBySlug(params.slug);
-    
+
     if (!exhibition) {
       return {
         notFound: true
       };
     }
-    
+
     return {
       props: {
         exhibition
