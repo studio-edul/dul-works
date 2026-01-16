@@ -1,13 +1,43 @@
 import Layout from '../../components/Layout';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { getExhibitionBySlug, getAllExhibitionSlugs } from '../../lib/exhibition-detail-processor';
+import { getExhibitionBasicBySlug, getAllExhibitionSlugs } from '../../lib/exhibition-detail-processor';
 import { createSlug } from '../../lib/slug-utils';
 import Link from 'next/link';
 
 export default function ExhibitionDetail({ exhibition }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [relatedTexts, setRelatedTexts] = useState([]);
+  const [artworks, setArtworks] = useState([]);
+  const [isSecondaryDataLoaded, setIsSecondaryDataLoaded] = useState(false);
+
+  // Secondary Data Fetching (Client-side)
+  useEffect(() => {
+    if (!exhibition || !exhibition.slug) return;
+
+    // Reset state when slug changes
+    setRelatedTexts([]);
+    setArtworks([]);
+    setIsSecondaryDataLoaded(false);
+
+    const fetchSecondaryData = async () => {
+      try {
+        const res = await fetch(`/api/exhibition/${exhibition.slug}/related`);
+        if (res.ok) {
+          const data = await res.json();
+          setRelatedTexts(data.relatedTexts || []);
+          setArtworks(data.artworks || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch secondary data:', error);
+      } finally {
+        setIsSecondaryDataLoaded(true);
+      }
+    };
+
+    fetchSecondaryData();
+  }, [exhibition?.slug]);
 
   if (!exhibition) {
     return (
@@ -162,12 +192,12 @@ export default function ExhibitionDetail({ exhibition }) {
             </div>
           )}
 
-          {/* ARTWORKS 섹션 */}
+          {/* ARTWORKS 섹션 (Client-side Fetching) */}
           <div className="exhibition-detail-artworks-section">
             <h3 className="exhibition-detail-artworks-title">ARTWORKS</h3>
-            {exhibition.artworks && Array.isArray(exhibition.artworks) && exhibition.artworks.length > 0 && (
+            {isSecondaryDataLoaded && artworks.length > 0 ? (
               <div className="exhibition-detail-artworks-list">
-                {exhibition.artworks.map((artwork, idx) => (
+                {artworks.map((artwork, idx) => (
                   <Link
                     key={idx}
                     href={`/work/${artwork.slug}`}
@@ -190,24 +220,31 @@ export default function ExhibitionDetail({ exhibition }) {
                   </Link>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
 
-          {/* Related Text 섹션 */}
-          {exhibition.relatedTexts && exhibition.relatedTexts.length > 0 && (
+          {/* Related Text 섹션 (Client-side Fetching) */}
+          {isSecondaryDataLoaded && relatedTexts.length > 0 && (
             <div className="exhibition-detail-related-text">
-              <h2 className="artwork-detail-name">Related Text</h2>
+              <h2 className="artwork-detail-name">RELATED</h2>
               <div className="exhibition-detail-related-links">
-                {exhibition.relatedTexts.map((relatedText, idx) => (
-                  <div key={idx} className="exhibition-detail-related-link-wrapper">
-                    <Link
-                      href={`/exhibition/${exhibition.slug}/related/${createSlug(relatedText.title)}`}
-                      className="exhibition-detail-related-link"
-                    >
-                      <span className="exhibition-detail-related-link-text">{relatedText.title}</span>
-                    </Link>
-                  </div>
-                ))}
+                {relatedTexts.map((relatedText, idx) => {
+                  const isExternal = !!relatedText.url;
+                  const href = isExternal ? relatedText.url : `/exhibition/${exhibition.slug}/related/${createSlug(relatedText.title)}`;
+
+                  return (
+                    <div key={idx} className="exhibition-detail-related-link-wrapper">
+                      <Link
+                        href={href}
+                        className="exhibition-detail-related-link"
+                        target={isExternal ? "_blank" : undefined}
+                        rel={isExternal ? "noopener noreferrer" : undefined}
+                      >
+                        <span className="exhibition-detail-related-link-text">{relatedText.title}</span>
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -385,7 +422,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   try {
-    const exhibition = await getExhibitionBySlug(params.slug);
+    const exhibition = await getExhibitionBasicBySlug(params.slug);
 
     if (!exhibition) {
       return {

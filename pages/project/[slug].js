@@ -330,12 +330,14 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
               <div className="project-detail-newborn-data-collection-wrapper">
                 <h3 className="project-detail-newborn-data-collection">01. DATA COLLECTION</h3>
                 <div className="project-detail-newborn-workflow-content">
-                  <div className="project-detail-newborn-workflow-row">
-                    <div className="project-detail-newborn-workflow-left">
-                      <p className="project-detail-newborn-workflow-text">
-                        Audiovisual data for AI training is collected using 360-degree cameras and spatial audio recorders.
-                        Please drag the map on the right to explore the data.
-                      </p>
+                  <div className="project-detail-newborn-workflow-text-column">
+                    <p className="project-detail-newborn-workflow-text">
+                      Audiovisual data for AI training is collected using 360-degree cameras and spatial audio recorders.
+                      Please drag the map on the below to explore the data.
+                    </p>
+                    <div className="project-detail-newborn-workflow-row">
+                      <div className="project-detail-newborn-workflow-rectangle">
+                      </div>
                       <div className="project-detail-newborn-stats-wrapper">
                         <div className="project-detail-newborn-stat-item">
                           <span className="project-detail-newborn-stat">TOTAL LOCATION</span>
@@ -367,8 +369,6 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                           </span>
                         </div>
                       </div>
-                    </div>
-                    <div className="project-detail-newborn-workflow-rectangle">
                     </div>
                   </div>
                 </div>

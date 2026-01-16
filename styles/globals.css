@@ -240,7 +240,8 @@
   }
 
   .description-box p {
-    @apply m-0 mb-[14px];
+    @apply m-0;
+    margin-bottom: var(--spacing-sm);
     line-height: 19px;
   }
 
@@ -461,7 +462,8 @@
   }
 
   .exhibition-description p {
-    @apply m-0 mb-[14px];
+    @apply m-0;
+    margin-bottom: var(--spacing-sm);
   }
 
   .exhibition-description p:last-child {
@@ -1551,25 +1553,28 @@
     border-left: 8px solid white;
   }
 
-  .project-detail-newborn-workflow-left {
+  .project-detail-newborn-workflow-row {
     display: flex;
-    flex-direction: column;
-    max-width: 300px;
-    flex-shrink: 0;
-    margin-left: 20px;
+    gap: 15px;
+    /* Reduced gap to 15px per user request */
   }
+
+  /* .project-detail-newborn-workflow-left removed */
 
   .project-detail-newborn-workflow-text {
     @apply font-sans;
     font-size: 14px;
     line-height: 1.4;
     margin: 0;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 15px;
+    /* User requested 15px gap */
+    width: 100%;
   }
 
   .project-detail-newborn-workflow-rectangle {
     background-color: #ccc;
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 1 / 1;
+    /* Changed to square per user request */
     width: 100%;
     flex: 1;
     min-width: 0;
@@ -1577,8 +1582,13 @@
 
   .project-detail-newborn-stats-wrapper {
     display: flex;
-    gap: 0;
-    max-width: 300px;
+    flex-direction: column;
+    gap: 30px;
+    width: auto;
+    /* Remove fixed width to fit content */
+    min-width: max-content;
+    /* Ensure it doesn't wrap awkwardly, or just fit-content */
+    flex-shrink: 0;
   }
 
   .project-detail-newborn-stat-item {
@@ -1587,7 +1597,8 @@
   }
 
   .project-detail-newborn-stat-item:first-child {
-    width: 150px;
+    width: 100%;
+    /* Reset from specific width */
   }
 
   .project-detail-newborn-stat {
@@ -2319,12 +2330,11 @@
     .project-detail-newborn-workflow-row {
       flex-direction: column;
       margin-bottom: 0;
+      gap: 20px;
     }
 
-    .project-detail-newborn-workflow-left {
-      max-width: 100%;
-      margin-left: 0;
-      margin-bottom: 15px;
+    .project-detail-newborn-stats-wrapper {
+      width: 100%;
     }
 
     .project-detail-newborn-workflow-text-column {

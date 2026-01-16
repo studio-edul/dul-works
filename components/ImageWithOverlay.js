@@ -18,7 +18,7 @@ export default function ImageWithOverlay({
   const containerClass = isFullWidth ? 'image-container-full' : 'image-container';
   const imageWidth = isFullWidth ? WIDTH_FULL : WIDTH_COLUMN;
   const imageHeight = isFullWidth ? 600 : 400;
-  
+
   // sizes 속성으로 반응형 이미지 최적화
   const sizes = isFullWidth
     ? `${WIDTH_FULL}px`
@@ -44,7 +44,6 @@ export default function ImageWithOverlay({
         <div className="overlay-text">
           <div className="overlay-text-title">{name || 'none'}</div>
           <div className="overlay-text-year">{timeline || 'none'}</div>
-          <div className="overlay-text-caption">{description || 'none'}</div>
         </div>
       </div>
     </Link>
