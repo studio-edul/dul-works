@@ -102,6 +102,11 @@
 
   .home-columns {
     --column-gap: 20px;
+    /* Home page column gap override */
+  }
+
+  .home-columns .exhibition-item {
+    margin-bottom: 50px;
   }
 
   .column {

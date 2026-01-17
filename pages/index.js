@@ -107,7 +107,7 @@ export default function Home({ artistStatement, currentExhibitions, currentProje
                   const { name, period, description } = project;
 
                   return (
-                    <Link key={project.name || idx} href={slug ? `/project/${slug}` : '#'} className="project-link" style={{ marginBottom: '30px' }}>
+                    <Link key={project.name || idx} href={slug ? `/project/${slug}` : '#'} className="project-link" style={{ marginBottom: '50px' }}>
                       <h2 className="project-item arrow-animated-link">{name}</h2>
                       {((period) || (description)) && (
                         <div className="description-box">
