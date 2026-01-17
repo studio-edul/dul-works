@@ -6,7 +6,7 @@
 
 :root {
   --column-width: 595px;
-  --column-gap: 10px;
+  --column-gap: 20px;
   --full-width-image: calc(var(--column-width) * 2 + var(--column-gap));
 
   /* Spacing */
