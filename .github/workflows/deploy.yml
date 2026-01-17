@@ -56,13 +56,9 @@ jobs:
           node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
 
-      # Notion API Keys extraction is implicit if they are committed (bad practice) or set as secrets.
-      # The user has env vars. For GitHub Actions, they MUST be set in Repo Settings > Secrets.
-      # I will add a step to create .env if secrets are available, or warn the user.
-      # For now, I assume they might be in the repo (since user said "checking in current code state"),
-      # OR I need to tell the user to add secrets. 
-      # Actually, static export will FAIL if it can't fetch data during build.
-      # This is CRITICAL.
+      # Notion API Keys and DB IDs are injected from GitHub Secrets
+      # Make sure to set these in your Repository Settings > Secrets > Actions
+
       
       - name: Restore cache
         uses: actions/cache@v4
