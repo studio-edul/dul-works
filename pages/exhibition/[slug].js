@@ -1,43 +1,15 @@
 import Layout from '../../components/Layout';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { getExhibitionBasicBySlug, getAllExhibitionSlugs } from '../../lib/exhibition-detail-processor';
+import { getExhibitionBasicBySlug, getAllExhibitionSlugs, getExhibitionSecondaryData } from '../../lib/exhibition-detail-processor';
 import { createSlug } from '../../lib/slug-utils';
 import Link from 'next/link';
 
-export default function ExhibitionDetail({ exhibition }) {
+export default function ExhibitionDetail({ exhibition, relatedTexts = [], artworks = [] }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [relatedTexts, setRelatedTexts] = useState([]);
-  const [artworks, setArtworks] = useState([]);
-  const [isSecondaryDataLoaded, setIsSecondaryDataLoaded] = useState(false);
 
-  // Secondary Data Fetching (Client-side) to improve initial load performance
-  useEffect(() => {
-    if (!exhibition || !exhibition.slug) return;
-
-    // Reset state when slug changes
-    setRelatedTexts([]);
-    setArtworks([]);
-    setIsSecondaryDataLoaded(false);
-
-    const fetchSecondaryData = async () => {
-      try {
-        const res = await fetch(`/api/exhibition/${exhibition.slug}/related`);
-        if (res.ok) {
-          const data = await res.json();
-          setRelatedTexts(data.relatedTexts || []);
-          setArtworks(data.artworks || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch secondary data:', error);
-      } finally {
-        setIsSecondaryDataLoaded(true);
-      }
-    };
-
-    fetchSecondaryData();
-  }, [exhibition?.slug]);
+  // Client-side fetching logic removed for Static Export compatibility
 
   if (!exhibition) {
     return (
@@ -167,7 +139,7 @@ export default function ExhibitionDetail({ exhibition }) {
                       {paragraph.map((textItem, textIdx) => {
                         const text = textItem.plain_text || '';
                         const annotations = textItem.annotations || {};
-                        
+
                         // bold 처리
                         if (annotations.bold) {
                           return <strong key={textIdx}>{text}</strong>;
@@ -192,10 +164,10 @@ export default function ExhibitionDetail({ exhibition }) {
             </div>
           )}
 
-          {/* ARTWORKS 섹션 (Client-side Fetching) */}
+          {/* ARTWORKS 섹션 (Static Data) */}
           <div className="exhibition-detail-artworks-section">
             <h3 className="exhibition-detail-artworks-title">ARTWORKS</h3>
-            {isSecondaryDataLoaded && artworks.length > 0 ? (
+            {artworks.length > 0 ? (
               <div className="exhibition-detail-artworks-list">
                 {artworks.map((artwork, idx) => (
                   <Link
@@ -223,8 +195,8 @@ export default function ExhibitionDetail({ exhibition }) {
             ) : null}
           </div>
 
-          {/* Related Text 섹션 (Client-side Fetching) */}
-          {isSecondaryDataLoaded && relatedTexts.length > 0 && (
+          {/* Related Text 섹션 (Static Data) */}
+          {relatedTexts.length > 0 && (
             <div className="exhibition-detail-related-text">
               <h2 className="artwork-detail-name">RELATED</h2>
               <div className="exhibition-detail-related-links">
@@ -418,20 +390,20 @@ export async function getStaticPaths() {
       paths: slugs.map(slug => ({
         params: { slug }
       })),
-      fallback: 'blocking' // 새로운 slug는 빌드 시 생성, 없으면 404
+      fallback: false // 'blocking'에서 false로 변경 (정적 내보내기 필수)
     };
   } catch (error) {
     console.error('getStaticPaths 오류:', error);
     return {
       paths: [],
-      fallback: 'blocking'
+      fallback: false
     };
   }
 }
 
 export async function getStaticProps({ params }) {
   try {
-    // Basic 데이터만 먼저 빠르게 가져옴
+    // Basic 데이터
     const exhibition = await getExhibitionBasicBySlug(params.slug);
 
     if (!exhibition) {
@@ -440,11 +412,15 @@ export async function getStaticProps({ params }) {
       };
     }
 
+    // Secondary 데이터 (Related Texts, Artworks)
+    const secondaryData = await getExhibitionSecondaryData(params.slug);
+
     return {
       props: {
-        exhibition
-      },
-      revalidate: 60 // ISR: 60초마다 재생성
+        exhibition,
+        relatedTexts: secondaryData.relatedTexts || [],
+        artworks: secondaryData.artworks || []
+      }
     };
   } catch (error) {
     console.error('getStaticProps 오류:', error);
