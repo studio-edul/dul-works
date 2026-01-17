@@ -5,8 +5,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400&family=Abhaya+Libre:wght@800&display=swap');
 
 :root {
+  /* Global column gap (default 10px) */
   --column-width: 595px;
-  --column-gap: 20px;
+  --column-gap: 10px;
   --full-width-image: calc(var(--column-width) * 2 + var(--column-gap));
 
   /* Spacing */
@@ -97,6 +98,10 @@
     @apply flex justify-center;
     gap: var(--column-gap);
     width: 100%;
+  }
+
+  .home-columns {
+    --column-gap: 20px;
   }
 
   .column {

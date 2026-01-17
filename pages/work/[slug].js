@@ -1,9 +1,12 @@
 import Layout from '../../components/Layout';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getArtworkBySlug, getAllArtworkSlugs } from '../../lib/artwork-detail-processor';
+import { createSlug } from '../../lib/slug-utils';
 
-export default function ArtworkDetail({ artwork }) {
+
+export default function ArtworkDetail({ artwork, relatedExhibition }) {
   const basePath = process.env.NODE_ENV === 'production' ? '/dul-works' : '';
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -162,6 +165,36 @@ export default function ArtworkDetail({ artwork }) {
               <div>none</div>
             </div>
           )}
+
+
+          {/* Related Exhibition Section (Moved inside text column) */}
+          {relatedExhibition && (
+            <div className="exhibition-detail-artworks-section">
+              <h3 className="exhibition-detail-artworks-title">EXHIBITION</h3>
+              <div className="exhibition-detail-artworks-list">
+                <Link
+                  href={`/exhibition/${createSlug(relatedExhibition.name)}`}
+                  className="exhibition-detail-artwork-item"
+                >
+                  <div className="exhibition-detail-artwork-metadata">
+                    <div className="exhibition-detail-artwork-name-wrapper">
+                      <h4 className="exhibition-detail-artwork-name arrow-animated-link">{relatedExhibition.name}</h4>
+                    </div>
+                    {relatedExhibition.period && (
+                      <div className="exhibition-detail-artwork-artist">{relatedExhibition.period}</div>
+                    )}
+                    {relatedExhibition.description && (
+                      <div className="exhibition-detail-artwork-caption">
+                        {relatedExhibition.description.split('\n').map((line, i) => (
+                          <span key={i} style={{ display: 'block' }}>{line}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 2번째 열: column이 1인 이미지들 */}
@@ -260,59 +293,65 @@ export default function ArtworkDetail({ artwork }) {
         </div>
       </div>
 
+      {/* Related Exhibition Section */}
+
+
+
       {/* 이미지 확대 팝업 */}
-      {isPopupOpen && sortedImages.length > 0 && (
-        <div className="artwork-image-popup-overlay" onClick={closePopup}>
-          <div className="artwork-image-popup-container" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="artwork-image-popup-close"
-              onClick={closePopup}
-              aria-label="닫기"
-            >
-              ×
-            </button>
-            <button
-              className="artwork-image-popup-nav artwork-image-popup-prev"
-              onClick={goToPreviousImage}
-              aria-label="이전 이미지"
-            >
-              <Image
-                src={`${basePath}/assets/icons/arrow_back.svg`}
-                alt="이전"
-                width={24}
-                height={24}
-              />
-            </button>
-            <button
-              className="artwork-image-popup-nav artwork-image-popup-next"
-              onClick={goToNextImage}
-              aria-label="다음 이미지"
-            >
-              <Image
-                src={`${basePath}/assets/icons/arrow_forward.svg`}
-                alt="다음"
-                width={24}
-                height={24}
-              />
-            </button>
-            <div className="artwork-image-popup-image-wrapper">
-              <Image
-                src={sortedImages[currentImageIndex].path}
-                alt={`${artwork.name} - Image ${currentImageIndex + 1}`}
-                width={1920}
-                height={1080}
-                className="artwork-image-popup-image"
-                quality={95}
-                priority
-              />
-            </div>
-            <div className="artwork-image-popup-counter">
-              {currentImageIndex + 1} / {sortedImages.length}
+      {
+        isPopupOpen && sortedImages.length > 0 && (
+          <div className="artwork-image-popup-overlay" onClick={closePopup}>
+            <div className="artwork-image-popup-container" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="artwork-image-popup-close"
+                onClick={closePopup}
+                aria-label="닫기"
+              >
+                ×
+              </button>
+              <button
+                className="artwork-image-popup-nav artwork-image-popup-prev"
+                onClick={goToPreviousImage}
+                aria-label="이전 이미지"
+              >
+                <Image
+                  src={`${basePath}/assets/icons/arrow_back.svg`}
+                  alt="이전"
+                  width={24}
+                  height={24}
+                />
+              </button>
+              <button
+                className="artwork-image-popup-nav artwork-image-popup-next"
+                onClick={goToNextImage}
+                aria-label="다음 이미지"
+              >
+                <Image
+                  src={`${basePath}/assets/icons/arrow_forward.svg`}
+                  alt="다음"
+                  width={24}
+                  height={24}
+                />
+              </button>
+              <div className="artwork-image-popup-image-wrapper">
+                <Image
+                  src={sortedImages[currentImageIndex].path}
+                  alt={`${artwork.name} - Image ${currentImageIndex + 1}`}
+                  width={1920}
+                  height={1080}
+                  className="artwork-image-popup-image"
+                  quality={95}
+                  priority
+                />
+              </div>
+              <div className="artwork-image-popup-counter">
+                {currentImageIndex + 1} / {sortedImages.length}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </Layout>
+        )
+      }
+    </Layout >
   );
 }
 
@@ -345,9 +384,34 @@ export async function getStaticProps({ params }) {
       };
     }
 
+    // 관련 전시 데이터 가져오기
+    let relatedExhibition = null;
+    if (artwork.exhibitionIds && artwork.exhibitionIds.length > 0) {
+      // 모든 WORK 데이터 로드 (Exhibition 찾기 위해)
+      const { getAllNotionDataServer } = await import('../../lib/notion-api-server');
+      const { WORK } = await getAllNotionDataServer();
+
+      // 첫 번째 연결된 전시 찾기 (보통 하나)
+      const targetId = artwork.exhibitionIds[0];
+      const exhibitionItem = WORK.find(item => item.id === targetId);
+
+      if (exhibitionItem) {
+        const { extractExhibitionData } = await import('../../lib/exhibition-processor');
+        const processedExhibition = await extractExhibitionData(exhibitionItem);
+        // 이미지는 렌더링하지 않기 위해 URL 제거 (User Req: "포스터만 빼고")
+        if (processedExhibition) {
+          relatedExhibition = {
+            ...processedExhibition,
+            imageUrl: null // Force remove image
+          };
+        }
+      }
+    }
+
     return {
       props: {
-        artwork
+        artwork,
+        relatedExhibition
       }
     };
   } catch (error) {
