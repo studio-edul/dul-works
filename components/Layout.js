@@ -33,6 +33,7 @@ export default function Layout({ children, title = 'Portfolio' }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link rel="preconnect" href="https://www.notion.so" />
         <link rel="dns-prefetch" href="https://www.notion.so" />
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
       </Head>
       {/* <div style={{ position: 'fixed', top: 10, left: 10, zIndex: 9999, background: 'rgba(0,0,0,0.5)', color: 'white', padding: '5px 10px', borderRadius: '5px', fontSize: '12px' }}>
         Width: {windowWidth}px
