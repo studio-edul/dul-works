@@ -46,20 +46,24 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Notion Blocks API Error:', errorData);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Notion Blocks API Error:', errorData);
+      }
       return res.status(response.status).json({ 
         error: 'Notion Blocks API Error',
-        details: errorData 
+        details: process.env.NODE_ENV === 'development' ? errorData : undefined
       });
     }
 
     const data = await response.json();
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Server Error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Server Error:', error);
+    }
     return res.status(500).json({ 
       error: 'Internal server error',
-      message: error.message 
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 }

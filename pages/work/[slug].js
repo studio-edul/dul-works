@@ -137,12 +137,12 @@ export default function ArtworkDetail({ artwork }) {
                       {paragraph.map((textItem, textIdx) => {
                         const text = textItem.plain_text || '';
                         const annotations = textItem.annotations || {};
-
+                        
                         // bold 처리
                         if (annotations.bold) {
                           return <strong key={textIdx}>{text}</strong>;
                         }
-                        return <span key={textIdx}>{text}</span>;
+                        return text;
                       })}
                     </p>
                   );

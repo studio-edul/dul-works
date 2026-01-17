@@ -32,7 +32,6 @@ export default async function handler(req, res) {
 
   // API 키 확인
   if (!NOTION_API_KEY) {
-    console.error('NOTION_API_KEY 환경 변수가 설정되지 않았습니다.');
     return res.status(500).json({ error: 'API key not configured' });
   }
 
@@ -45,8 +44,6 @@ export default async function handler(req, res) {
   
   // 데이터베이스 ID 정리 (공백 제거, 하이픈 제거)
   const cleanedId = databaseId.trim().replace(/-/g, '');
-  
-  console.log(`Querying database: ${database}`);
 
   try {
     const response = await fetch(`https://api.notion.com/v1/databases/${cleanedId}/query`, {
@@ -64,20 +61,24 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Notion API Error:', errorData);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Notion API Error:', errorData);
+      }
       return res.status(response.status).json({ 
         error: 'Notion API Error',
-        details: errorData 
+        details: process.env.NODE_ENV === 'development' ? errorData : undefined
       });
     }
 
     const data = await response.json();
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Server Error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Server Error:', error);
+    }
     return res.status(500).json({ 
       error: 'Internal server error',
-      message: error.message 
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 }

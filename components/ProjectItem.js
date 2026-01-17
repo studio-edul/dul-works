@@ -19,14 +19,14 @@ export default function ProjectItem({ project, artworkImages, isFirstProject = f
     <div className="description-box">
       {periodHtml}
       {descriptionContent.split('\n').map((line, idx) => (
-        <p key={idx}>{line}</p>
+        <p key={idx} className="artwork-detail-paragraph">{line}</p>
       ))}
     </div>
   ) : null;
 
   const textContent = (
     <Link key="text" href={slug ? `/project/${slug}` : '#'} className="project-link">
-      <div className="project-item">{name}</div>
+      <h2 className="project-item arrow-animated-link">{name}</h2>
       {descriptionHtml}
     </Link>
   );

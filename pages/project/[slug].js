@@ -4,7 +4,7 @@ import React from 'react';
 import { getProjectBySlug, getAllProjectSlugs } from '../../lib/project-data';
 import ImageWithOverlay from '../../components/ImageWithOverlay';
 
-export default function ProjectDetail({ project, slug, newbornArtworks }) {
+export default function ProjectDetail({ project, slug }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [pinModal, setPinModal] = useState({ open: false, title: '', coord: '' });
@@ -13,6 +13,34 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
   const [isImageDragging, setIsImageDragging] = useState(false);
   const [imageSliderPosition2, setImageSliderPosition2] = useState(50);
   const [isImageDragging2, setIsImageDragging2] = useState(false);
+
+  // Client-side fetching for Artworks
+  const [newbornArtworks, setNewbornArtworks] = useState([]);
+  const [isArtworksLoaded, setIsArtworksLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!slug) return;
+
+    // Reset when slug changes
+    setNewbornArtworks([]);
+    setIsArtworksLoaded(false);
+
+    const fetchArtworks = async () => {
+      try {
+        const res = await fetch(`/api/project/${slug}/artworks`);
+        if (res.ok) {
+          const data = await res.json();
+          setNewbornArtworks(data.artworks || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch project artworks:', error);
+      } finally {
+        setIsArtworksLoaded(true);
+      }
+    };
+
+    fetchArtworks();
+  }, [slug]);
 
   if (!project) {
     return (
@@ -156,32 +184,20 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
     <Layout title={`Portfolio - ${project.name}`}>
       <div className={`project-detail-container ${isNewbornSpace ? 'newborn-space' : ''}`}>
         {/* Header Section */}
-        <header className="project-detail-header">
-          <div className="project-detail-header-content">
-            {!isNewbornSpace && <p className="project-detail-mono">R&D LABORATORY</p>}
-            <h1 className="project-detail-title">
-              {isNewbornSpace ? (
-                project.name
-              ) : (
-                project.name.split(':').map((part, idx) => (
-                  <span key={idx}>
-                    {idx === 1 ? (
-                      <span className="project-detail-accent">{part}</span>
-                    ) : (
-                      part
-                    )}
-                    {idx === 0 && ':'}
-                  </span>
-                ))
-              )}
-            </h1>
-            {project.description && !isNewbornSpace && (
-              <div className="project-detail-abstract">
-                <p><strong>[Abstract]</strong> {project.description}</p>
-              </div>
-            )}
+        {isNewbornSpace ? (
+          <header className="project-detail-header">
+            <div className="project-detail-header-content">
+              <h1 className="project-detail-title">
+                {project.name}
+              </h1>
+            </div>
+          </header>
+        ) : (
+          <div style={{ padding: '2rem 0', textAlign: 'center' }}>
+            <h1 style={{ marginBottom: '100px' }}>{project.name}</h1>
+            <p style={{ textAlign: 'center' }}>Work in progress. Content coming soon.</p>
           </div>
-        </header>
+        )}
 
         {/* 신생공 페이지 섹션들 */}
         {isNewbornSpace && (
@@ -190,16 +206,16 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
               <section className="project-detail-newborn-section">
                 <h2 className="project-detail-newborn-title">PROJECT OVERVIEW</h2>
                 <div className="project-detail-newborn-content">
-                  <p className="project-detail-newborn-paragraph">
+                  <p className="artwork-detail-paragraph project-detail-newborn-paragraph">
                     Rapid advancements in media technology have blurred the boundaries between physical reality and virtual space, fundamentally reshaping how we enjoy and experience space. Contemporary individuals, accustomed to the infinite variations of digital space, demand new stimuli and experiences even within essentially fixed physical environments. However, these fixed physical forms face limitations in keeping pace with the rapidly changing speed of sensory experience. Amidst this flow of the times, <span>'Newborn' seeks sustainable values that allow physical space to be continuously enjoyed.</span>
                   </p>
-                  <p className="project-detail-newborn-paragraph">
+                  <p className="artwork-detail-paragraph project-detail-newborn-paragraph">
                     Project 'Newborn Space' is an experiment that predicts and implements future cultural patterns through contemporary technology. It is an attempt to grant a new form—befitting current and future technological environments—to things destined to disappear due to technology, thereby allowing their existence to continue. In this context, 'Newborn Space' <span>moves away from the vision that has dominated the basis of spatial perception and summons the marginalized 'auditory sense' to the center.</span> While vision clearly separates and defines objects, sound flows without boundaries, permeating and filling the gaps of space, functioning as an invisible medium. Auditory information, which we perceive but often do not consciously register, indirectly conveys information about a space. This project brings these auditory layers to the forefront, attempting <span>'Spatial Upcycling'</span> to endow familiar physical spaces with invisible value. Instead of physical reconstruction, it adopts a method of collecting and reinterpreting sound information inherent in a location to overlay layers of invisible experience onto the space. This is a complete paradigm shift that <span>subverts solid Ocularcentrism</span> and allows space to be sensed anew through audible vibrations rather than visible forms.
                   </p>
-                  <p className="project-detail-newborn-paragraph">
+                  <p className="artwork-detail-paragraph project-detail-newborn-paragraph">
                     'Newborn Space' is not a fixed entity but an organic landscape that is constantly created and extinguished according to sound waves. Artificial intelligence, having learned 360-degree audiovisual data collected from various locations, constructs a virtual space solely based on input sound, with visual information eliminated. The AI in the work functions beyond a simple computing device; it acts as a <span>'Synesthetic Narrator'</span> that senses forests, oceans, and unknown spaces within the collected data. The process where cold urban noise is reduced to images of dense forests, while the flowing sounds of nature transition into dry mechanical forms, provides the audience with an intense synesthetic expansion. Paradoxically, this allows contemporaries accustomed to the infinite variations of digital space to <span>experience the most immersive 'The Real'</span> within a physical space.
                   </p>
-                  <p className="project-detail-newborn-paragraph">
+                  <p className="artwork-detail-paragraph project-detail-newborn-paragraph">
                     Through a landscape of sound that rejects fixed forms and flows endlessly, 'Newborn Space' makes the audience perceive familiar daily spaces as unfamiliar and rediscover the infinite possibilities inherent within them. Standing before a space where auditory senses interpret and AI recreates—beyond the physical reality defined by vision—the audience comes to gaze at the flip side of the physical world we stand on. This is an artistic performance that goes beyond simple aesthetic appreciation of space, presenting a new existential meaning for physical space in response to the expanding digital realm, and <span>fundamentally rethinking the way humans relate to space.</span>
                   </p>
                 </div>
@@ -210,10 +226,10 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
                 <h2 className="project-detail-newborn-title">TECHNICAL PROCESS</h2>
                 <div className="project-detail-newborn-content">
                   <div className="project-detail-newborn-text-group">
-                    <p className="project-detail-newborn-paragraph">
+                    <p className="artwork-detail-paragraph project-detail-newborn-paragraph">
                       'Newborn Space' is a project that <span>transforms auditory information inherent in physical space into visual space using artificial intelligence.</span> The AI, trained on 360-degree audiovisual data collected from various locations, identifies the correlation between sound and image, generating virtual space based on input sound. The space generated in this way is delivered to the audience through various media, forming a <span>fluid landscape</span> that constantly changes in reaction to ambient sound.
                     </p>
-                    <p className="project-detail-newborn-paragraph">
+                    <p className="artwork-detail-paragraph project-detail-newborn-paragraph">
                       The project performs systematic version control based on data collection methods, model structures, and input audio characteristics. Each version number represents: <span>Major (structural transitions), Minor (gradual improvements), and Patch (detailed modifications).</span> As data accumulates and the model improves through repetitive learning, a more concrete form of 'Newborn Space' is being realized, and <span>each version clearly records this process of technological evolution.</span>
                     </p>
                   </div>
@@ -606,6 +622,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks }) {
           </div>
         )}
 
+
         {/* Section 01: Data Collection */}
         {sections.section01 && (
           <section className="project-detail-section">
@@ -904,56 +921,12 @@ export async function getStaticProps({ params }) {
     };
   }
 
-  let newbornArtworks = [];
-
-  // newborn-space 페이지인 경우 artwork 데이터 가져오기 (기존 로직 유지)
-  // 또는 이름에 'newborn'이 포함된 경우 관련 artwork 가져오기 시도
-  if (params.slug.includes('newborn')) {
-    try {
-      const { getARTWORKDataServer, getWORKDataServer } = await import('../../lib/notion-api-server');
-      const { loadArtworkImagesForProject } = await import('../../lib/artwork-processor');
-      const { processWorkData } = await import('../../lib/work-processor');
-
-      // workData가 위에서 이미 로드되었을 수 있지만, 안전하게 다시 로드하거나 캐시 활용
-      const [workData, artworkData] = await Promise.all([
-        getWORKDataServer(),
-        getARTWORKDataServer()
-      ]);
-
-      const projects = processWorkData(workData);
-      const projectNames = projects.map(p => p.name).filter(Boolean);
-
-      // 현재 프로젝트 이름으로 먼저 시도
-      let artworks = await loadArtworkImagesForProject(project.name, artworkData, projectNames);
-
-      if (artworks.length > 0) {
-        newbornArtworks = artworks;
-      } else {
-        // 찾지 못한 경우 'newborn' 키워드로 대안 찾기
-        const possibleNames = ['NEWBORN SPACE', '신생공NEWBORN SPACE', 'Newborn Space', 'newborn space'];
-        for (const projectName of possibleNames) {
-          // 현재 프로젝트와 관련 없는 건 제외해야 하지만, 'newborn' 관련 페이지들이라면 공유할 수도 있음.
-          // 여기선 단순히 newborn-space 특화 로직이었던 것을 조금 확장
-          if (params.slug === 'newborn-space') {
-            const altArtworks = await loadArtworkImagesForProject(projectName, artworkData, projectNames);
-            if (altArtworks.length > 0) {
-              newbornArtworks = altArtworks;
-              break;
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Artwork 데이터 로드 오류:', error);
-      newbornArtworks = [];
-    }
-  }
+  // Artworks are fetched client-side
 
   return {
     props: {
       project,
-      slug: params.slug,
-      newbornArtworks
+      slug: params.slug
     },
     revalidate: 60
   };

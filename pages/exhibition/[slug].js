@@ -12,7 +12,7 @@ export default function ExhibitionDetail({ exhibition }) {
   const [artworks, setArtworks] = useState([]);
   const [isSecondaryDataLoaded, setIsSecondaryDataLoaded] = useState(false);
 
-  // Secondary Data Fetching (Client-side)
+  // Secondary Data Fetching (Client-side) to improve initial load performance
   useEffect(() => {
     if (!exhibition || !exhibition.slug) return;
 
@@ -167,12 +167,12 @@ export default function ExhibitionDetail({ exhibition }) {
                       {paragraph.map((textItem, textIdx) => {
                         const text = textItem.plain_text || '';
                         const annotations = textItem.annotations || {};
-
+                        
                         // bold 처리
                         if (annotations.bold) {
                           return <strong key={textIdx}>{text}</strong>;
                         }
-                        return <span key={textIdx}>{text}</span>;
+                        return text;
                       })}
                     </p>
                   );
@@ -205,7 +205,7 @@ export default function ExhibitionDetail({ exhibition }) {
                   >
                     <div className="exhibition-detail-artwork-metadata">
                       <div className="exhibition-detail-artwork-name-wrapper">
-                        <h4 className="exhibition-detail-artwork-name">{artwork.name}</h4>
+                        <h4 className="exhibition-detail-artwork-name arrow-animated-link">{artwork.name}</h4>
                       </div>
                       {artwork.artist && (
                         <div className="exhibition-detail-artwork-artist">{artwork.artist}</div>
@@ -240,7 +240,16 @@ export default function ExhibitionDetail({ exhibition }) {
                         target={isExternal ? "_blank" : undefined}
                         rel={isExternal ? "noopener noreferrer" : undefined}
                       >
-                        <span className="exhibition-detail-related-link-text">{relatedText.title}</span>
+                        <span className="exhibition-detail-related-link-text" style={{ display: 'flex', flexDirection: 'column' }}>
+                          {relatedText.type && relatedText.rawTitle ? (
+                            <>
+                              <h4 className="arrow-animated-link" style={{ marginBottom: '5px' }}>{relatedText.rawTitle}</h4>
+                              <span style={{ opacity: 0.3 }}>{relatedText.type}</span>
+                            </>
+                          ) : (
+                            relatedText.title
+                          )}
+                        </span>
                       </Link>
                     </div>
                   );
@@ -422,6 +431,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   try {
+    // Basic 데이터만 먼저 빠르게 가져옴
     const exhibition = await getExhibitionBasicBySlug(params.slug);
 
     if (!exhibition) {

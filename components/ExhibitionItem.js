@@ -7,26 +7,27 @@ export default function ExhibitionItem({ exhibition, isFull, priority = false })
   const { name, period, description, imageUrl, index, classType } = exhibition;
   const slug = name ? createSlug(name) : null;
 
-  // 전시명 앞에 [SOLO] 또는 [GROUP] 추가
-  const getExhibitionPrefix = () => {
+  // Exhibition 타입 텍스트 생성
+  const getExhibitionTypeText = () => {
     if (classType === 'SOLO EXHIBITION') {
-      return '[SOLO] ';
+      return 'Solo Exhibition';
     } else if (classType === 'GROUP EXHIBITION') {
-      return '[GROUP] ';
+      return 'Group Exhibition';
     }
     return '';
   };
 
-  const displayName = `${getExhibitionPrefix()}${name}`;
+  const exhibitionTypeText = getExhibitionTypeText();
 
   // Exhibition 텍스트와 이미지 콘텐츠 생성
   const periodHtml = period ? <div className="exhibition-period">{period}</div> : '';
   const descriptionContent = description || '';
-  const descriptionHtml = (periodHtml || descriptionContent) ? (
+  const descriptionHtml = (exhibitionTypeText || periodHtml || descriptionContent) ? (
     <div className="description-box">
+      {exhibitionTypeText && <div className="exhibition-type">{exhibitionTypeText}</div>}
       {periodHtml}
       {descriptionContent.split('\n').map((line, idx) => (
-        <p key={idx}>{line}</p>
+        <p key={idx} className="artwork-detail-paragraph">{line}</p>
       ))}
     </div>
   ) : null;
@@ -34,7 +35,7 @@ export default function ExhibitionItem({ exhibition, isFull, priority = false })
   return (
     <div className={`exhibition-item ${isFull ? 'is-full-width-item' : ''}`}>
       <Link href={slug ? `/exhibition/${slug}` : '#'} className="exhibition-item-link">
-        <h2 className="exhibition-name">{displayName}</h2>
+        <h2 className="exhibition-name">{name}</h2>
         {descriptionHtml}
         {imageUrl && (
           <div className="image-container">
