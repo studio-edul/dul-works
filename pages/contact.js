@@ -3,26 +3,27 @@ import ContactIcon from '../components/ContactIcon';
 import Link from 'next/link';
 
 export default function Contact() {
+  const basePath = process.env.NODE_ENV === 'production' ? '/dul-works' : '';
   const contacts = [
-    { 
-      name: 'mail', 
-      src: '/assets/icons/mail.svg', 
+    {
+      name: 'mail',
+      src: `${basePath}/assets/icons/mail.svg`,
       alt: 'Email',
       text: 'easyone.work@gmail.com',
       href: 'mailto:easyone.work@gmail.com',
       isLink: false
     },
-    { 
-      name: 'instagram', 
-      src: '/assets/icons/instagram.svg', 
+    {
+      name: 'instagram',
+      src: `${basePath}/assets/icons/instagram.svg`,
       alt: 'Instagram',
       text: 'https://www.instagram.com/easy_dul/',
       href: 'https://www.instagram.com/easy_dul/',
       isLink: true
     },
-    { 
-      name: 'github', 
-      src: '/assets/icons/github.svg', 
+    {
+      name: 'github',
+      src: `${basePath}/assets/icons/github.svg`,
       alt: 'GitHub',
       text: 'https://github.com/studio-edul',
       href: 'https://github.com/studio-edul',

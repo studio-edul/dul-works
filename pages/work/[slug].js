@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getArtworkBySlug, getAllArtworkSlugs } from '../../lib/artwork-detail-processor';
 
 export default function ArtworkDetail({ artwork }) {
+  const basePath = process.env.NODE_ENV === 'production' ? '/dul-works' : '';
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -276,7 +277,7 @@ export default function ArtworkDetail({ artwork }) {
               aria-label="이전 이미지"
             >
               <Image
-                src="/assets/icons/arrow_back.svg"
+                src={`${basePath}/assets/icons/arrow_back.svg`}
                 alt="이전"
                 width={24}
                 height={24}
@@ -288,7 +289,7 @@ export default function ArtworkDetail({ artwork }) {
               aria-label="다음 이미지"
             >
               <Image
-                src="/assets/icons/arrow_forward.svg"
+                src={`${basePath}/assets/icons/arrow_forward.svg`}
                 alt="다음"
                 width={24}
                 height={24}
