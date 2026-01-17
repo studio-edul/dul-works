@@ -19,8 +19,7 @@ export async function getStaticProps() {
 
 
     return {
-      props: {},
-      revalidate: 60 // ISR: 60초마다 재생성
+      props: {}
     };
   } catch (error) {
     console.error('데이터 미리 로드 오류:', error);

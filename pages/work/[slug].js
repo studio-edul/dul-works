@@ -137,7 +137,7 @@ export default function ArtworkDetail({ artwork }) {
                       {paragraph.map((textItem, textIdx) => {
                         const text = textItem.plain_text || '';
                         const annotations = textItem.annotations || {};
-                        
+
                         // bold 처리
                         if (annotations.bold) {
                           return <strong key={textIdx}>{text}</strong>;
@@ -323,13 +323,13 @@ export async function getStaticPaths() {
       paths: slugs.map(slug => ({
         params: { slug }
       })),
-      fallback: 'blocking' // 새로운 slug는 빌드 시 생성, 없으면 404
+      fallback: false // 새로운 slug는 빌드 시 생성, 없으면 404
     };
   } catch (error) {
     console.error('getStaticPaths 오류:', error);
     return {
       paths: [],
-      fallback: 'blocking'
+      fallback: false
     };
   }
 }
@@ -347,8 +347,7 @@ export async function getStaticProps({ params }) {
     return {
       props: {
         artwork
-      },
-      revalidate: 60 // ISR: 60초마다 재생성
+      }
     };
   } catch (error) {
     console.error('getStaticProps 오류:', error);

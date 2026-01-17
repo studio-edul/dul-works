@@ -23,13 +23,12 @@ export async function getStaticProps() {
   try {
     const cvData = await getCVDataServer();
     const { classGroups, sortedClasses } = groupCVDataByClass(cvData);
-    
+
     return {
       props: {
         classGroups,
         sortedClasses
-      },
-      revalidate: 60 // ISR: 60초마다 재생성
+      }
     };
   } catch (error) {
     console.error('CV 데이터 로드 오류:', error);

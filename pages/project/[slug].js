@@ -4,7 +4,7 @@ import React from 'react';
 import { getProjectBySlug, getAllProjectSlugs } from '../../lib/project-data';
 import ImageWithOverlay from '../../components/ImageWithOverlay';
 
-export default function ProjectDetail({ project, slug }) {
+export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [pinModal, setPinModal] = useState({ open: false, title: '', coord: '' });
@@ -13,34 +13,6 @@ export default function ProjectDetail({ project, slug }) {
   const [isImageDragging, setIsImageDragging] = useState(false);
   const [imageSliderPosition2, setImageSliderPosition2] = useState(50);
   const [isImageDragging2, setIsImageDragging2] = useState(false);
-
-  // Client-side fetching for Artworks
-  const [newbornArtworks, setNewbornArtworks] = useState([]);
-  const [isArtworksLoaded, setIsArtworksLoaded] = useState(false);
-
-  useEffect(() => {
-    if (!slug) return;
-
-    // Reset when slug changes
-    setNewbornArtworks([]);
-    setIsArtworksLoaded(false);
-
-    const fetchArtworks = async () => {
-      try {
-        const res = await fetch(`/api/project/${slug}/artworks`);
-        if (res.ok) {
-          const data = await res.json();
-          setNewbornArtworks(data.artworks || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch project artworks:', error);
-      } finally {
-        setIsArtworksLoaded(true);
-      }
-    };
-
-    fetchArtworks();
-  }, [slug]);
 
   if (!project) {
     return (
@@ -873,7 +845,7 @@ export async function getStaticPaths() {
       paths: allSlugs.map(slug => ({
         params: { slug }
       })),
-      fallback: 'blocking' // 새로운 데이터가 있을 수 있으므로 blocking
+      fallback: false // 새로운 데이터가 있을 수 있으므로 blocking
     };
   } catch (error) {
     console.error('getStaticPaths 오류:', error);
@@ -882,7 +854,7 @@ export async function getStaticPaths() {
       paths: staticSlugs.map(slug => ({
         params: { slug }
       })),
-      fallback: 'blocking'
+      fallback: false
     };
   }
 }
@@ -921,13 +893,57 @@ export async function getStaticProps({ params }) {
     };
   }
 
-  // Artworks are fetched client-side
+  let artworks = [];
+  if (params.slug.includes('newborn')) {
+    try {
+      const { getWORKDataServer, getARTWORKDataServer } = await import('../../lib/notion-api-server');
+      const { processWorkData } = await import('../../lib/work-processor');
+      const { createSlug } = await import('../../lib/slug-utils');
+      const { loadArtworkImagesForProject } = await import('../../lib/artwork-processor');
+
+      const [workData, artworkData] = await Promise.all([
+        getWORKDataServer(),
+        getARTWORKDataServer()
+      ]);
+
+      const projects = processWorkData(workData);
+      const projectNames = projects.map(p => p.name).filter(Boolean);
+
+      const currentNotionProject = projects.find(p => createSlug(p.name) === params.slug)
+        || projects.find(p => p.name.includes('NEWBORN') || p.name.includes('Newborn'));
+
+      let projectId = currentNotionProject ? currentNotionProject.id : null;
+      let projectName = currentNotionProject ? currentNotionProject.name : project.name;
+
+      if (projectId) {
+        artworks = await loadArtworkImagesForProject(projectId, projectName, artworkData, projectNames);
+      }
+
+      if (artworks.length === 0) {
+        const possibleNames = ['NEWBORN SPACE', '신생공NEWBORN SPACE', 'Newborn Space', 'newborn space'];
+        for (const pName of possibleNames) {
+          if (params.slug === 'newborn-space') {
+            const pItem = projects.find(p => p.name === pName || p.name.includes(pName));
+            const pId = pItem ? pItem.id : null;
+            const targetId = pId || null;
+            const altArtworks = await loadArtworkImagesForProject(targetId, pName, artworkData, projectNames);
+            if (altArtworks.length > 0) {
+              artworks = altArtworks;
+              break;
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching project artworks in getStaticProps:', error);
+    }
+  }
 
   return {
     props: {
       project,
-      slug: params.slug
-    },
-    revalidate: 60
+      slug: params.slug,
+      newbornArtworks: artworks
+    }
   };
 }
