@@ -6,7 +6,7 @@ import { getArtworkBySlug, getAllArtworkSlugs } from '../../lib/artwork-detail-p
 import { createSlug } from '../../lib/slug-utils';
 
 
-export default function ArtworkDetail({ artwork, relatedExhibition }) {
+export default function ArtworkDetail({ artwork, relatedExhibitions }) {
   const basePath = process.env.NODE_ENV === 'production' ? '/dul-works' : '';
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -110,7 +110,7 @@ export default function ArtworkDetail({ artwork, relatedExhibition }) {
         {/* 1번째 열: 텍스트 정보 */}
         <div className="artwork-detail-text-column">
           <h2 className="artwork-detail-name">{artwork.name}</h2>
-          {(artwork.artist || artwork.timeline || artwork.caption) && (
+          {(artwork.artist || artwork.timeline || artwork.dimension || artwork.caption) && (
             <div className="artwork-detail-metadata">
               {artwork.artist && (
                 <div className="artwork-detail-artist">{artwork.artist}</div>
@@ -168,30 +168,33 @@ export default function ArtworkDetail({ artwork, relatedExhibition }) {
 
 
           {/* Related Exhibition Section (Moved inside text column) */}
-          {relatedExhibition && (
+          {relatedExhibitions && relatedExhibitions.length > 0 && (
             <div className="exhibition-detail-artworks-section">
               <h3 className="exhibition-detail-artworks-title">EXHIBITION</h3>
               <div className="exhibition-detail-artworks-list">
-                <Link
-                  href={`/exhibition/${createSlug(relatedExhibition.name)}`}
-                  className="exhibition-detail-artwork-item"
-                >
-                  <div className="exhibition-detail-artwork-metadata">
-                    <div className="exhibition-detail-artwork-name-wrapper">
-                      <h4 className="exhibition-detail-artwork-name arrow-animated-link">{relatedExhibition.name}</h4>
-                    </div>
-                    {relatedExhibition.period && (
-                      <div className="exhibition-detail-artwork-artist">{relatedExhibition.period}</div>
-                    )}
-                    {relatedExhibition.description && (
-                      <div className="exhibition-detail-artwork-caption">
-                        {relatedExhibition.description.split('\n').map((line, i) => (
-                          <span key={i} style={{ display: 'block' }}>{line}</span>
-                        ))}
+                {relatedExhibitions.map((exhibition, idx) => (
+                  <Link
+                    key={idx}
+                    href={`/exhibition/${createSlug(exhibition.name)}`}
+                    className="exhibition-detail-artwork-item"
+                  >
+                    <div className="exhibition-detail-artwork-metadata">
+                      <div className="exhibition-detail-artwork-name-wrapper">
+                        <h4 className="exhibition-detail-artwork-name arrow-animated-link">{exhibition.name}</h4>
                       </div>
-                    )}
-                  </div>
-                </Link>
+                      {exhibition.period && (
+                        <div className="exhibition-detail-artwork-artist">{exhibition.period}</div>
+                      )}
+                      {exhibition.description && (
+                        <div className="exhibition-detail-artwork-caption">
+                          {exhibition.description.split('\n').map((line, i) => (
+                            <span key={i} style={{ display: 'block' }}>{line}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           )}
@@ -385,33 +388,37 @@ export async function getStaticProps({ params }) {
     }
 
     // 관련 전시 데이터 가져오기
-    let relatedExhibition = null;
+    let relatedExhibitions = [];
     if (artwork.exhibitionIds && artwork.exhibitionIds.length > 0) {
       // 모든 WORK 데이터 로드 (Exhibition 찾기 위해)
       const { getAllNotionDataServer } = await import('../../lib/notion-api-server');
       const { WORK } = await getAllNotionDataServer();
+      const { extractExhibitionData } = await import('../../lib/exhibition-processor');
 
-      // 첫 번째 연결된 전시 찾기 (보통 하나)
-      const targetId = artwork.exhibitionIds[0];
-      const exhibitionItem = WORK.find(item => item.id === targetId);
-
-      if (exhibitionItem) {
-        const { extractExhibitionData } = await import('../../lib/exhibition-processor');
-        const processedExhibition = await extractExhibitionData(exhibitionItem);
-        // 이미지는 렌더링하지 않기 위해 URL 제거 (User Req: "포스터만 빼고")
-        if (processedExhibition) {
-          relatedExhibition = {
-            ...processedExhibition,
-            imageUrl: null // Force remove image
-          };
+      // 모든 연결된 전시 찾기 (Promise.all로 병렬 처리)
+      const exhibitionPromises = artwork.exhibitionIds.map(async (targetId) => {
+        const exhibitionItem = WORK.find(item => item.id === targetId);
+        if (exhibitionItem) {
+          const processed = await extractExhibitionData(exhibitionItem);
+          if (processed) {
+            return {
+              ...processed,
+              imageUrl: null // Force remove image (User Req: "포스터만 빼고")
+            };
+          }
         }
-      }
+        return null; // 못 찾으면 null
+      });
+
+      const results = await Promise.all(exhibitionPromises);
+      // null 값 필터링
+      relatedExhibitions = results.filter(item => item !== null);
     }
 
     return {
       props: {
         artwork,
-        relatedExhibition
+        relatedExhibitions
       }
     };
   } catch (error) {
