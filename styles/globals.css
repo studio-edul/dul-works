@@ -1714,7 +1714,7 @@
 
   .project-detail-newborn-image-vertical-slider-label {
     position: absolute;
-    left: -50px;
+    left: -45px;
     color: white;
     font-size: 14px;
     white-space: nowrap;
@@ -1762,6 +1762,12 @@
     width: 100%;
     flex: 1;
     min-width: 0;
+    overflow: hidden;
+  }
+
+  #google-map-container {
+    width: 100%;
+    height: 100%;
   }
 
   .project-detail-newborn-stats-wrapper {

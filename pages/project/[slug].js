@@ -15,6 +15,8 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
   const [isImageDragging2, setIsImageDragging2] = useState(false);
   const [verticalSliderPosition, setVerticalSliderPosition] = useState(50);
   const [isVerticalDragging, setIsVerticalDragging] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const mapRef = React.useRef(null);
 
   if (!project) {
     return (
@@ -207,6 +209,75 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
     }
   }, [isVerticalDragging]);
 
+  // Google Maps 스크립트 로드 및 초기화
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const initMap = () => {
+      const mapContainer = document.getElementById('google-map-container');
+      if (!mapContainer) {
+        // 컨테이너가 아직 없으면 재시도
+        setTimeout(initMap, 100);
+        return;
+      }
+      
+      if (mapRef.current) return; // 이미 초기화됨
+
+      try {
+        const map = new window.google.maps.Map(mapContainer, {
+          center: { lat: 36.5, lng: 127.5 }, // 대한민국 중심
+          zoom: 6, // 80% 정도 채우는 줌 레벨
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+        mapRef.current = map;
+      } catch (error) {
+        console.error('Google Maps initialization error:', error);
+      }
+    };
+
+    // 이미 Google Maps API가 로드되어 있는지 확인
+    if (window.google && window.google.maps && window.google.maps.Map) {
+      // 약간의 지연을 두어 DOM이 완전히 렌더링된 후 초기화
+      setTimeout(initMap, 100);
+    } else {
+      // 스크립트가 이미 있는지 확인
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      
+      if (existingScript) {
+        // 스크립트가 있으면 로드 완료를 기다림
+        if (existingScript.onload) {
+          const originalOnload = existingScript.onload;
+          existingScript.onload = () => {
+            originalOnload();
+            setTimeout(initMap, 100);
+          };
+        } else {
+          existingScript.onload = () => {
+            setTimeout(initMap, 100);
+          };
+        }
+      } else {
+        // 스크립트가 없으면 새로 추가
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          if (window.google && window.google.maps && window.google.maps.Map) {
+            setTimeout(initMap, 100);
+          }
+        };
+        script.onerror = () => {
+          console.error('Failed to load Google Maps API');
+        };
+        document.head.appendChild(script);
+      }
+    }
+  }, []);
 
   const openPin = (title, coord) => {
     setPinModal({ open: true, title, coord });
@@ -214,6 +285,37 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
 
   const closePin = () => {
     setPinModal({ open: false, title: '', coord: '' });
+  };
+
+  // 국가별 좌표 설정
+  const regionCoordinates = {
+    KR: { lat: 36.5, lng: 127.5, zoom: 6 }, // 한국
+    JP: { lat: 36.2, lng: 138.3, zoom: 6 }, // 일본
+    FR: { lat: 46.6, lng: 2.2, zoom: 6 }, // 프랑스
+    DE: { lat: 51.2, lng: 10.5, zoom: 6 }, // 독일
+    NL: { lat: 52.1, lng: 5.3, zoom: 7 }, // 네덜란드
+  };
+
+  // REGIONS 버튼 클릭 시 지도 이동
+  const handleRegionClick = (region) => {
+    setActiveRegion(region);
+    if (mapRef.current && regionCoordinates[region]) {
+      const { lat, lng, zoom } = regionCoordinates[region];
+      const currentZoom = mapRef.current.getZoom();
+      
+      // 줌 레벨이 다르면 먼저 줌 변경
+      if (currentZoom !== zoom) {
+        mapRef.current.setZoom(zoom);
+        setTimeout(() => {
+          if (mapRef.current) {
+            mapRef.current.panTo({ lat, lng });
+          }
+        }, 50);
+      } else {
+        // 줌 레벨이 같으면 바로 위치 이동 (애니메이션 적용)
+        mapRef.current.panTo({ lat, lng });
+      }
+    }
   };
 
   const { sections } = project;
@@ -392,6 +494,7 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
                     </p>
                     <div className="project-detail-newborn-workflow-row">
                       <div className="project-detail-newborn-workflow-rectangle">
+                        <div id="google-map-container" style={{ width: '100%', height: '100%' }}></div>
                       </div>
                       <div className="project-detail-newborn-stats-wrapper">
                         <div className="project-detail-newborn-stat-item">
@@ -403,23 +506,23 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
                           <span className="project-detail-newborn-stat-value">
                             <span
                               className={`project-detail-newborn-region ${activeRegion === 'KR' ? 'project-detail-newborn-region-active' : ''}`}
-                              onClick={() => setActiveRegion('KR')}
+                              onClick={() => handleRegionClick('KR')}
                             >KR</span>
                             <span
                               className={`project-detail-newborn-region ${activeRegion === 'JP' ? 'project-detail-newborn-region-active' : ''}`}
-                              onClick={() => setActiveRegion('JP')}
+                              onClick={() => handleRegionClick('JP')}
                             >JP</span>
                             <span
                               className={`project-detail-newborn-region ${activeRegion === 'FR' ? 'project-detail-newborn-region-active' : ''}`}
-                              onClick={() => setActiveRegion('FR')}
+                              onClick={() => handleRegionClick('FR')}
                             >FR</span>
                             <span
                               className={`project-detail-newborn-region ${activeRegion === 'DE' ? 'project-detail-newborn-region-active' : ''}`}
-                              onClick={() => setActiveRegion('DE')}
+                              onClick={() => handleRegionClick('DE')}
                             >DE</span>
                             <span
                               className={`project-detail-newborn-region ${activeRegion === 'NL' ? 'project-detail-newborn-region-active' : ''}`}
-                              onClick={() => setActiveRegion('NL')}
+                              onClick={() => handleRegionClick('NL')}
                             >NL</span>
                           </span>
                         </div>
