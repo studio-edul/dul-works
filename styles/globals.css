@@ -1608,6 +1608,8 @@
     height: 100%;
     background-color: #999;
     aspect-ratio: 2 / 1;
+    overflow: hidden;
+    z-index: 1;
   }
 
   .project-detail-newborn-image-top {
@@ -1665,6 +1667,74 @@
     border-top: 6px solid transparent;
     border-bottom: 6px solid transparent;
     border-left: 8px solid white;
+  }
+
+  .project-detail-newborn-image-vertical-slider {
+    position: absolute;
+    right: 10px;
+    height: calc(100% - 20px);
+    width: 18px;
+    z-index: 3;
+    top: 10px;
+    cursor: row-resize;
+    display: flex;
+    justify-content: center;
+  }
+
+  .project-detail-newborn-image-vertical-slider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background-color: white;
+  }
+
+  .project-detail-newborn-image-vertical-slider-handle {
+    position: absolute;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border-radius: 50%;
+    z-index: 2;
+    cursor: row-resize;
+  }
+
+  .project-detail-newborn-image-vertical-slider-marker {
+    position: absolute;
+    left: 50%;
+    width: 8px;
+    height: 1px;
+    background-color: white;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+  }
+
+  .project-detail-newborn-image-vertical-slider-label {
+    position: absolute;
+    left: -50px;
+    color: white;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 2;
+    text-align: right;
+    width: 40px;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .project-detail-newborn-image-slider-arrow-top {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 8px solid white;
+  }
+
+  .project-detail-newborn-image-slider-arrow-bottom {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid white;
   }
 
   .project-detail-newborn-workflow-row {

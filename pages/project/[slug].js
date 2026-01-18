@@ -13,6 +13,8 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
   const [isImageDragging, setIsImageDragging] = useState(false);
   const [imageSliderPosition2, setImageSliderPosition2] = useState(50);
   const [isImageDragging2, setIsImageDragging2] = useState(false);
+  const [verticalSliderPosition, setVerticalSliderPosition] = useState(50);
+  const [isVerticalDragging, setIsVerticalDragging] = useState(false);
 
   if (!project) {
     return (
@@ -140,6 +142,71 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
       };
     }
   }, [isImageDragging2]);
+
+  const handleVerticalSliderMove = (clientY) => {
+    const slider = document.getElementById('image-slider-overlay-2');
+    if (!slider) return;
+
+    const rect = slider.getBoundingClientRect();
+    let pos = clientY - rect.top;
+    if (pos < 10) pos = 10;
+    if (pos > rect.height - 10) pos = rect.height - 10;
+
+    const percent = ((pos - 10) / (rect.height - 20)) * 100;
+    setVerticalSliderPosition(percent);
+  };
+
+  // 세로 슬라이더 위치에 따라 영상 인덱스와 opacity 계산
+  const getVideoIndicesAndOpacity = (position) => {
+    // position: 0-100%를 1-12로 매핑
+    // 0% = 영상 1, 100% = 영상 12
+    const value = (position / 100) * 11; // 0-11 범위
+    const currentIndex = Math.floor(value) + 1; // 1-12
+    const nextIndex = Math.min(currentIndex + 1, 12);
+    const currentOpacity = 1 - (value % 1);
+    const nextOpacity = value % 1;
+    
+    return {
+      currentIndex,
+      nextIndex,
+      currentOpacity,
+      nextOpacity
+    };
+  };
+
+  const handleVerticalMouseDown = (e) => {
+    e.stopPropagation();
+    setIsVerticalDragging(true);
+    handleVerticalSliderMove(e.clientY);
+  };
+
+  const handleVerticalSliderClick = (e) => {
+    e.stopPropagation();
+    setIsVerticalDragging(true);
+    handleVerticalSliderMove(e.clientY);
+  };
+
+  const handleVerticalMouseMove = (e) => {
+    if (isVerticalDragging) {
+      handleVerticalSliderMove(e.clientY);
+    }
+  };
+
+  const handleVerticalMouseUp = () => {
+    setIsVerticalDragging(false);
+  };
+
+  useEffect(() => {
+    if (isVerticalDragging) {
+      window.addEventListener('mousemove', handleVerticalMouseMove);
+      window.addEventListener('mouseup', handleVerticalMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleVerticalMouseMove);
+        window.removeEventListener('mouseup', handleVerticalMouseUp);
+      };
+    }
+  }, [isVerticalDragging]);
+
 
   const openPin = (title, coord) => {
     setPinModal({ open: true, title, coord });
@@ -372,23 +439,129 @@ export default function ProjectDetail({ project, slug, newbornArtworks = [] }) {
                       <div className="project-detail-newborn-workflow-approach-wrapper">
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div className="project-detail-newborn-workflow-approach-image"></div>
-                          <div
-                            className="project-detail-newborn-image-overlay"
-                            id="image-slider-overlay-2"
-                            onMouseDown={handleImageMouseDown2}
-                            style={{ cursor: isImageDragging2 ? 'col-resize' : 'col-resize' }}
-                          >
-                            <div className="project-detail-newborn-image-bottom"></div>
+                          <div style={{ position: 'relative' }}>
                             <div
-                              className="project-detail-newborn-image-top"
-                              style={{ clipPath: `polygon(0 0, ${imageSliderPosition2}% 0, ${imageSliderPosition2}% 100%, 0 100%)` }}
-                            ></div>
-                            <div
-                              className="project-detail-newborn-image-slider"
-                              style={{ left: `${imageSliderPosition2}%` }}
+                              className="project-detail-newborn-image-overlay"
+                              id="image-slider-overlay-2"
+                              onMouseDown={handleImageMouseDown2}
+                              style={{ cursor: isImageDragging2 ? 'col-resize' : 'col-resize' }}
                             >
-                              <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-left"></div>
-                              <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-right"></div>
+                              <div className="project-detail-newborn-image-bottom">
+                                {(() => {
+                                  const { currentIndex, nextIndex, currentOpacity, nextOpacity } = getVideoIndicesAndOpacity(verticalSliderPosition);
+                                  return (
+                                    <>
+                                      <video
+                                        key={`directional-mel-${currentIndex}`}
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                        style={{
+                                          position: 'absolute',
+                                          top: 0,
+                                          left: 0,
+                                          width: '100%',
+                                          height: '100%',
+                                          objectFit: 'cover',
+                                          opacity: currentOpacity,
+                                          transition: isVerticalDragging ? 'none' : 'opacity 0.3s ease'
+                                        }}
+                                      >
+                                        <source src={`/assets/videos/directional_mel_${String(currentIndex).padStart(2, '0')}.mp4`} type="video/mp4" />
+                                      </video>
+                                      {nextIndex !== currentIndex && (
+                                        <video
+                                          key={`directional-mel-${nextIndex}`}
+                                          autoPlay
+                                          loop
+                                          muted
+                                          playsInline
+                                          style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            opacity: nextOpacity,
+                                            transition: isVerticalDragging ? 'none' : 'opacity 0.3s ease'
+                                          }}
+                                        >
+                                          <source src={`/assets/videos/directional_mel_${String(nextIndex).padStart(2, '0')}.mp4`} type="video/mp4" />
+                                        </video>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                              <div
+                                className="project-detail-newborn-image-top"
+                                style={{ clipPath: `polygon(0 0, ${imageSliderPosition2}% 0, ${imageSliderPosition2}% 100%, 0 100%)` }}
+                              >
+                                <video
+                                  autoPlay
+                                  loop
+                                  muted
+                                  playsInline
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                >
+                                  <source src="/assets/videos/rgba_mel.mp4" type="video/mp4" />
+                                </video>
+                              </div>
+                              <div
+                                className="project-detail-newborn-image-slider"
+                                style={{ left: `${imageSliderPosition2}%` }}
+                              >
+                                <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-left"></div>
+                                <div className="project-detail-newborn-image-slider-arrow project-detail-newborn-image-slider-arrow-right"></div>
+                              </div>
+                            </div>
+                            <div
+                              className="project-detail-newborn-image-vertical-slider"
+                              onMouseDown={handleVerticalSliderClick}
+                              style={{ cursor: isVerticalDragging ? 'row-resize' : 'row-resize' }}
+                            >
+                              {Array.from({ length: 12 }, (_, i) => {
+                                const position = (i / 11) * 100;
+                                return (
+                                  <div
+                                    key={i}
+                                    className="project-detail-newborn-image-vertical-slider-marker"
+                                    style={{
+                                      top: `${position}%`,
+                                      transform: 'translate(-50%, -50%)'
+                                    }}
+                                  ></div>
+                                );
+                              })}
+                              <div
+                                className="project-detail-newborn-image-vertical-slider-label project-detail-newborn-image-vertical-slider-label-top"
+                                style={{
+                                  top: '0%',
+                                  transform: 'translateY(calc(-50% + 5px))'
+                                }}
+                              >
+                                20kHz
+                              </div>
+                              <div
+                                className="project-detail-newborn-image-vertical-slider-label project-detail-newborn-image-vertical-slider-label-bottom"
+                                style={{
+                                  top: '100%',
+                                  transform: 'translateY(-50%)'
+                                }}
+                              >
+                                20Hz
+                              </div>
+                              <div
+                                className="project-detail-newborn-image-vertical-slider-handle"
+                                onMouseDown={handleVerticalMouseDown}
+                                style={{
+                                  top: `${verticalSliderPosition}%`,
+                                  cursor: isVerticalDragging ? 'row-resize' : 'row-resize',
+                                  transform: 'translate(-50%, -50%)'
+                                }}
+                              ></div>
                             </div>
                           </div>
                           <div className="project-detail-newborn-image-labels">
